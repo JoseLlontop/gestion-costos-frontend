@@ -1,6 +1,6 @@
 import '../css/main.css';
 
-const Main = () => {
+const Home = () => {
   return (
     <seccion className="main">
 
@@ -18,8 +18,8 @@ const Main = () => {
                         <img src="img/opciones/1.jpg" alt=""/>
                     </div>
                     <div className="descripcion">
-                      <p className="nombre">Funcionalidad 1</p>
-                      <p className="detalle">Descripcion de la Funcionalidad</p>
+                      <p className="nombre">Gestion de Ingredientes</p>
+                      <p className="detalle">Realiza el alta, baja y modificación de ingredientes de manera rápida y sencilla</p>
                     </div>
                 </div>
 
@@ -60,4 +60,4 @@ const Main = () => {
   );
 };
 
-export default Main;
+export default Home;
