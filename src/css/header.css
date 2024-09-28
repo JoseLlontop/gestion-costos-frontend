@@ -1,24 +1,25 @@
 header {
-    background: url("../img/bg.jpg") #49a3d6;
+    background: url("../img/fondo.jpg") #63d3d4;
     /*Aseguridad que el fondo no se repita*/
     background-repeat: no-repeat;
     background-position: center;
     /*Establecemos el alto maiximo*/
-    max-height: 500px; 
+    max-height: 600px; 
+    height: 480px;
   }
   
   header .contenedor {
     position: relative; /* Esto permite que los elementos hijos posicionados absolutamente se ubiquen dentro del contenedor */
   }
   
-  /* Estilos para el logo */
+  /* Estilos para el logo 
   header .logo {
     position: absolute; /* Posiciona el logo de manera absoluta dentro del contenedor */
-    bottom: 0; /* Lo posiciona en la parte inferior */
-    left: 0;  /* Lo coloca en la parte izquierda */
-    width: 260px; /* Ajusta el tamaño del logo */
-    margin-bottom: -20px;
-  }
+   /* bottom: 0; /* Lo posiciona en la parte inferior */
+   /* left: 0;  /* Lo coloca en la parte izquierda */
+   /* width: 200px; /* Ajusta el tamaño del logo */
+   /* margin-bottom: -20px;
+  } */
   
   
   header .menu {
