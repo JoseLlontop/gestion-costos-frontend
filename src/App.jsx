@@ -1,13 +1,20 @@
-import Header from './components/Header';
-import Main from './components/Main';
-import Footer from './components/Footer';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { Header, Footer } from "./components";
+import { Home, GestionIngredientes } from "./pages";
 
 function App() {
   return (
     <div>
-      <Header />
-      <Main />
-      <Footer />
+      <BrowserRouter>
+        <Header />
+
+        <Routes>
+          <Route path='/' element={<Home/>}/>
+          <Route path='gestionIngredientes' element={<GestionIngredientes/>}/>
+        </Routes>
+
+        <Footer />    
+      </BrowserRouter>
     </div>
   );
 }
