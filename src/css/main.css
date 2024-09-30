@@ -67,6 +67,16 @@
     margin-bottom: 10px; 
     margin-top: 20px;
   }
+
+  .main .opciones .contenedor-cada-opciones .opcion .descripcion .no-subrayado {
+    text-decoration: none; /* Quita el subrayado */
+    color: inherit; /* Mantiene el color original */
+  }
+
+  .main .opciones .contenedor-cada-opciones .opcion .descripcion .no-subrayado:hover {
+    text-decoration: none; /* Asegura que tampoco haya subrayado al hacer hover */
+  }
+  
   
   .main .opciones .contenedor-cada-opciones .opcion .descripcion .detalle {
     font-size: 16px;

@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import '../css/main.css';
 
 const Home = () => {
@@ -15,10 +16,14 @@ const Home = () => {
 
                   <div className="opcion">
                     <div className="imagen-opcion">
-                        <img src="img/opciones/1.jpg" alt=""/>
+                      <Link to="/gestionIngredientes">
+                           <img src="img/opciones/1.jpg" alt="Gestion de Ingredientes" />
+                      </Link>
                     </div>
                     <div className="descripcion">
-                      <p className="nombre">Gestion de Ingredientes</p>
+                    <Link to="/gestionIngredientes" className="no-subrayado">
+                      <p className="nombre">Gestión de Ingredientes</p>
+                    </Link>
                       <p className="detalle">Realiza el alta, baja y modificación de ingredientes de manera rápida y sencilla</p>
                     </div>
                 </div>
