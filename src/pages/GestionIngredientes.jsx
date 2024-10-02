@@ -74,7 +74,7 @@ const GestionIngredientes = () => {
                           <tr key={ingrediente.id}>
                             <td>{(i + 1)}</td>
                             <td>{ingrediente.nombre}</td>
-                            <td>{ingrediente.cantidad}</td>
+                            <td>{ingrediente.cantidad_paquete}</td>
                             <td>{ingrediente.unidad_medida}</td>
                             <td>${new Intl.NumberFormat("es-mx").format(ingrediente.precio)}</td>
                             <td>{ingrediente.marca}</td>
