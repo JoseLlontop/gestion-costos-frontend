@@ -10,6 +10,7 @@ import { useApiRequest } from '../hook/useApiRequest';
 const GestionRecetas = () => {
 
     const [recetas, setRecetas] = useState([]);
+    const [nombreRecetaBuscada, setNombreRecetaBuscada] = useState(""); // Estado para almacenar el nombre de la receta que el usuario busca
 
     const { data, isLoading, error } = useApiRequest('http://localhost:8080/api/recetas', 'GET');
 
@@ -20,6 +21,10 @@ const GestionRecetas = () => {
         }
       }, [data, isLoading, error]);
 
+    // Filtrar las recetas si el usuario ha escrito algo en el campo de búsqueda
+    const recetasFiltradas = recetas.filter(receta =>
+        receta.nombreReceta.toLowerCase().includes(nombreRecetaBuscada.toLowerCase())
+    );
 
 
 
@@ -40,6 +45,15 @@ const GestionRecetas = () => {
             <div className='row mt-3'>
               <div className='col-12 col-lg-8 offset-lg-2'>
 
+                {/* Campo de búsqueda */}
+                <input
+                  type="text"
+                  className="form-control mb-3"
+                  placeholder="Buscar receta por nombre"
+                  value={nombreRecetaBuscada} // Vincular el valor del input con el estado
+                  onChange={(e) => setNombreRecetaBuscada(e.target.value)} // Actualizar el nombre buscado
+                />
+
     
                 <div className='table-responsive'>
                   <table className='table table-bordered'>
@@ -55,8 +69,8 @@ const GestionRecetas = () => {
 
                     {/* Cuerpo de la tabla */}
                     <tbody className='table-group-divider'>
-                      {recetas.length > 0 ? (
-                        recetas.map((receta, i) => (
+                      {recetasFiltradas.length > 0 ? (
+                        recetasFiltradas.map((receta, i) => (
                           <tr key={receta.id}>
                             <td>{(i + 1)}</td>
                             <td>{receta.nombreReceta}</td>
@@ -67,7 +81,7 @@ const GestionRecetas = () => {
                         ))
                       ) : (
                         <tr>
-                          <td colSpan="6" className='text-center'>No hay recetas cargadas </td>
+                          <td colSpan="6" className='text-center'>No se encontraron recetas</td>
                         </tr>
                       )}
                     </tbody>
