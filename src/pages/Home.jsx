@@ -30,11 +30,15 @@ const Home = () => {
 
                 <div className="opcion">
                   <div className="imagen-opcion">
+                  <Link to="/gestionRecetas" className="no-subrayado">
                       <img src="img/opciones/2.jpg" alt=""/>
+                  </Link>
                   </div>
                   <div className="descripcion">
-                    <p className="nombre">Funcionalidad 2</p>
-                    <p className="detalle">Descripcion de la Funcionalidad</p>
+                  <Link to="/gestionRecetas" className="no-subrayado">
+                    <p className="nombre">Gestión de Recetas</p>
+                  </Link>
+                    <p className="detalle">Administra tus recetas, crea nuevas, modifica o elimina las existentes de manera fácil y rápida</p>
                   </div>
                 </div> 
 
