@@ -3,7 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css"
 import "@fortawesome/fontawesome-free/css/all.min.css"
 import "bootstrap/dist/js/bootstrap.bundle"
 import 'postcss';
-
+import { ModalNuevaReceta } from '../components';
 import { useEffect, useState } from 'react';
 import { useApiRequest } from '../hook/useApiRequest'; 
 
@@ -29,15 +29,16 @@ const GestionRecetas = () => {
 
 
     return (
+       
         <div className='gestionRecetas my-5'>
           <div className='container-fluid'>
-
             <div className='row mt-3'>
               <div className='col-md-4 offset-md-4'>
                 <div className='d-grid mx-auto mt-6'>
                   <button className='btn btn-dark' data-bs-toggle="modal" data-bs-target="#modalRecetas">
                     <i className='fa-solid fa-circle-plus'></i> Añadir Receta
                   </button>
+                  <ModalNuevaReceta />
                 </div>
               </div>
             </div>
