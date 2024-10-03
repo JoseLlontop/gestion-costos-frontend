@@ -81,14 +81,17 @@ const GestionRecetas = () => {
                             <td align="center">{receta.porcionesRinde}</td>
                             <td style={{ color: 'green' }} ><strong>${receta.costoTotal}</strong></td>
                             <td style={{ color: 'blue' }}><strong>${receta.costoPorPorcion}</strong></td>
-                            <td>
-                              <button className="btn btn-primary btn-sm me-2">
-                                <i className="fa-solid fa-edit"></i> 
+                            <td className='d-flex align-items-center'>                             
+                              
+                              <button 
+                                className='btn btn-warning me-2' data-bs-toggle='modal' data-bs-target='#modalRecetas'>
+                                <i className='fa-solid fa-edit'></i>
                               </button>
-                              <button className="btn btn-danger btn-sm">
-                                <i className="fa-solid fa-trash"></i> 
+                              <button className='btn btn-danger'>
+                                <i className='fa-solid fa-trash'></i>
                               </button>
                             </td>
+
                           </tr>
                         ))
                       ) : (
