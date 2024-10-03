@@ -12,7 +12,7 @@ const GestionRecetas = () => {
     const [recetas, setRecetas] = useState([]);
     const [nombreRecetaBuscada, setNombreRecetaBuscada] = useState(""); // Estado para almacenar el nombre de la receta que el usuario busca
 
-    const { data, isLoading, error } = useApiRequest(`${import.meta.env.VITE_BACKEND_API_URL}:${import.meta.env.VITE_BACKEND_API_PORT}/api/recetas`, 'GET');
+    const { data, isLoading, error } = useApiRequest(`${import.meta.env.VITE_BACKEND_API_URL}:${import.meta.env.VITE_BACKEND_API_PORT}/api/recetas/`, 'GET');
     
     useEffect(() => {
         if (!isLoading && !error) {
