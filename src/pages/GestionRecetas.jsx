@@ -63,7 +63,10 @@ const GestionRecetas = () => {
                         <th>#</th>
                         <th>Receta</th>
                         <th>Descripcion</th>
-                        <th>Cantidad de porciones</th>
+                        <th>Cantidad de porciones que rinde</th>
+                        <th>Costo total</th>
+                        <th>Costo por porcion</th>
+                        <th>Acciones</th>
                       </tr>
                     </thead>
 
@@ -75,8 +78,17 @@ const GestionRecetas = () => {
                             <td>{(i + 1)}</td>
                             <td>{receta.nombreReceta}</td>
                             <td>{receta.descripcion}</td>
-                            <td>{receta.cantidadPorciones}</td>
-
+                            <td align="center">{receta.porcionesRinde}</td>
+                            <td style={{ color: 'green' }} ><strong>${receta.costoTotal}</strong></td>
+                            <td style={{ color: 'blue' }}><strong>${receta.costoPorPorcion}</strong></td>
+                            <td>
+                              <button className="btn btn-primary btn-sm me-2">
+                                <i className="fa-solid fa-edit"></i> 
+                              </button>
+                              <button className="btn btn-danger btn-sm">
+                                <i className="fa-solid fa-trash"></i> 
+                              </button>
+                            </td>
                           </tr>
                         ))
                       ) : (
@@ -85,12 +97,10 @@ const GestionRecetas = () => {
                         </tr>
                       )}
                     </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-
-            {/* Mostrar mensaje si no hay recetas */}
+                    </table>
+                    </div>
+                    </div>
+                    </div>
             {recetas.length === 0 && !isLoading && !error && (
               <div className='row'>
                 <div className='col-12 text-center'>
