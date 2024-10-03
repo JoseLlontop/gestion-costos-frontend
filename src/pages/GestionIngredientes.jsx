@@ -12,7 +12,7 @@ const GestionIngredientes = () => {
     const [ingredientes, setIngredientes] = useState([]);
     const [nombreIngredienteBuscado, setNombreIngredienteBuscado] = useState(""); // Estado para almacenar el nombre del ingrediente que el usuario busca
 
-    const { data, isLoading, error } = useApiRequest(`${import.meta.env.VITE_BACKEND_API_URL}:${import.meta.env.VITE_BACKEND_API_PORT}/api/ingredientes`, 'GET');
+    const { data, isLoading, error } = useApiRequest(`${import.meta.env.VITE_BACKEND_API_URL}:${import.meta.env.VITE_BACKEND_API_PORT}/api/ingredientes/`, 'GET');
 
     useEffect(() => {
       if (!isLoading && !error) {
