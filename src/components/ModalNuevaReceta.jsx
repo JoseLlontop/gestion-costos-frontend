@@ -1,14 +1,18 @@
-// Estilos
-import "bootstrap/dist/css/bootstrap.min.css";
+import React, { useState } from "react";
+import { Box, Button, TextField, Typography, Modal, IconButton, Alert, InputAdornment } from "@mui/material";
+import CloseIcon from '@mui/icons-material/Close';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faComment, faUtensils, faListOl } from "@fortawesome/free-solid-svg-icons";
+import { show_alerta } from '../helpers/functionSweetAlert'; 
+import ModalAgregarIngredienteXReceta from './ModalAgregarIngredienteXReceta';
 
-import { useEffect, useState } from "react";
-import { useApiRequest } from "../hook/useApiRequest";
-
-const ModalNuevaReceta = () => {
-    const [nombre, setNombre] = useState([]);
-    const [descripcion, setDescripcion] = useState([]);
-    const [porcionesRinde, setPorcionesRinde] = useState([]);
+const ModalNuevaReceta = ({ open, handleClose }) => {
+    const [nombre, setNombre] = useState("");
+    const [descripcion, setDescripcion] = useState("");
+    const [porcionesRinde, setPorcionesRinde] = useState("");
     const [mensaje, setMensaje] = useState(""); // Estado para manejar la respuesta y el mensaje de éxito/error
+    const [recetaId, setRecetaId] = useState(null);
+    const [modalIngredientesOpen, setModalIngredientesOpen] = useState(false);
 
     //Función para manejar el envío del formulario
     const handleSubmit = async (e) => {
@@ -17,14 +21,14 @@ const ModalNuevaReceta = () => {
 
         const nuevaReceta = {
             nombreReceta: nombre,
-            descripcionReceta: descripcion,
-            porcionesRindeReceta: parseInt(porcionesRinde), // convierte a int
+            descripcion: descripcion,
+            porcionesRinde: parseInt(porcionesRinde), // convierte a int
         };
 
         try {
             // Realizar la solicitud POST al backend
             const response = await fetch(
-                "${import.meta.env.VITE_BACKEND_API_URL}:${import.meta.env.VITE_BACKEND_API_PORT}/api/recetas",
+                `${import.meta.env.VITE_BACKEND_API_URL}:${import.meta.env.VITE_BACKEND_API_PORT}/api/recetas/crear`,
                 {
                     method: "POST",
                     headers: {
@@ -35,98 +39,116 @@ const ModalNuevaReceta = () => {
             );
 
             if (response.ok) {
-                setMensaje("Receta creada con exito");
+                const data = await response.json();
+                setRecetaId(data.id);
+                setMensaje("Receta creada con éxito");
+                show_alerta("Receta creada con éxito", "success"); // Mostrar alerta de éxito
                 // Limpiar los campos después de crear la receta
                 setNombre("");
                 setDescripcion("");
                 setPorcionesRinde("");
+                // Cerrar el modal después de guardar
+                handleClose();
+                // Abrir el modal para agregar ingredientes
+                setModalIngredientesOpen(true);
             } else {
                 setMensaje("Error al crear la receta");
+                show_alerta("Error al crear la receta", "error"); // Mostrar alerta de error
             }
         } catch (error) {
             console.error("Error en la solicitud al backend", error);
-            setMensaje("Ocurrio un error inesperado.");
+            setMensaje("Ocurrió un error inesperado.");
+            show_alerta("Ocurrió un error inesperado.", "error"); // Mostrar alerta de error
         }
     };
 
     return (
-        <div
-            className="modal fade"
-            id="modalRecetas"
-            tabIndex="-1"
-            aria-labelledby="exampleModalLabel"
-            aria-hidden="true"
-        >
-            <div className="modal-dialog">
-                <div className="modal-content">
-                    <div className="modal-header">
-                        <button
-                            type="button"
-                            className="btn-close"
-                            data-bs-dismiss="modal"
-                            aria-label="close"
-                        ></button>
-                    </div>
-                    <div className="modal-body">
-                        <div className="input-group mb-3">
-                            <span className="input-group-text">
-                                <i className="fa-solid fa-comment"></i>
-                            </span>
-                            <input
-                                type="text"
-                                id="nombreReceta"
-                                className="form-control"
-                                placeholder="Nombre"
-                                value={nombre}
-                                onChange={(e) => setNombre(e.target.value)}
-                            ></input>
-                        </div>
-                        <div className="input-group mb-3">
-                            <span className="input-group-text">
-                                <i className="fa-solid fa-clipboard"></i>
-                            </span>
-                            <input
-                                type="text"
-                                id="descripcion"
-                                className="form-control"
-                                placeholder="Descripcion"
-                                value={descripcion}
-                                onChange={(e) => setDescripcion(e.target.value)}
-                            ></input>
-                        </div>
-                        <div className="input-group mb-3">
-                            <span className="input-group-text">
-                                <i className="fa-solid fa-pizza-slice"></i>
-                            </span>
-                            <input
-                                type="text"
-                                id="porciones_rinde"
-                                className="form-control"
-                                placeholder="Rendimiento en porciones"
-                                value={porcionesRinde}
-                                onChange={(e) =>
-                                    setPorcionesRinde(e.target.value)
-                                }
-                            ></input>
-                        </div>
+        <>
+            <Modal open={open} onClose={handleClose}>
+                <Box sx={{ 
+                    position: 'absolute', 
+                    top: '50%', 
+                    left: '50%', 
+                    transform: 'translate(-50%, -50%)', 
+                    width: 400, 
+                    bgcolor: 'background.paper', 
+                    boxShadow: 24, 
+                    p: 4 
+                }}>
+                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                        <Typography variant="h6" component="h2">
+                            Añadir Nueva Receta
+                        </Typography>
+                        <IconButton onClick={handleClose}>
+                            <CloseIcon />
+                        </IconButton>
+                    </Box>
+                    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
+                        <TextField
+                            fullWidth
+                            label="Nombre"
+                            variant="outlined"
+                            value={nombre}
+                            onChange={(e) => setNombre(e.target.value)}
+                            sx={{ mb: 2 }}
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <FontAwesomeIcon icon={faUtensils} />
+                                    </InputAdornment>
+                                ),
+                            }}
+                        />
+                        <TextField
+                            fullWidth
+                            label="Descripción"
+                            variant="outlined"
+                            value={descripcion}
+                            onChange={(e) => setDescripcion(e.target.value)}
+                            sx={{ mb: 2 }}
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <FontAwesomeIcon icon={faComment} />
+                                    </InputAdornment>
+                                ),
+                            }}
+                        />
+                        <TextField
+                            fullWidth
+                            label="Rendimiento en porciones"
+                            variant="outlined"
+                            value={porcionesRinde}
+                            onChange={(e) => setPorcionesRinde(e.target.value)}
+                            sx={{ mb: 2 }}
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <FontAwesomeIcon icon={faListOl} />
+                                    </InputAdornment>
+                                ),
+                            }}
+                        />
                         {mensaje && (
-                            <div className="alert alert-info">{mensaje}</div>
+                            <Alert severity="info" sx={{ mb: 2 }}>{mensaje}</Alert>
                         )}
-                    </div>
-                    <div className="modal-footer  ">
-                        <button
-                            className="btn btn-success w-100
-                            onClick={handleSubmit}"
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            color="primary"
+                            fullWidth
                         >
-                            {" "}
-                            // conectar la funcion de envio
-                            <i className="fa-solid fa-floppy-disk"></i>
-                            &nbsp;&nbsp;Guardar
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+                            Guardar
+                        </Button>
+                    </Box>
+                </Box>
+            </Modal>
+            <ModalAgregarIngredienteXReceta
+                open={modalIngredientesOpen}
+                handleClose={() => setModalIngredientesOpen(false)}
+                recetaId={recetaId}
+            />
+        </>
     );
 };
 

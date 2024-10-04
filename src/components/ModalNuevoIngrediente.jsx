@@ -1,134 +1,171 @@
-import "bootstrap/dist/css/bootstrap.min.css";
+import { useState } from "react";
+import {
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    TextField,
+    Button,
+    Alert,
+    InputAdornment,
+} from "@mui/material";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faComment, faDollar } from "@fortawesome/free-solid-svg-icons";
+import { show_alerta } from '../helpers/functionSweetAlert'; // Importa show_alerta
 
-import { useEffect, useState } from "react";
-import { useApiRequest } from "../hook/useApiRequest";
-
-const ModalNuevoIngrediente = ({onSave}) => {
-    const [nombre, setNombre] = useState([]);
-    const [marca, setMarca] = useState([]);
-    const [precio, setPrecio] = useState([]);
-    const [unidad_medida, setUnidadMedida] = useState([]);
-    const [cantidad_paquete, setCantidadPaquete] = useState([]);
-
+const ModalNuevoIngrediente = ({ open, onClose, onSave }) => {
+    const [nombre, setNombre] = useState("");
+    const [marca, setMarca] = useState("");
+    const [precio, setPrecio] = useState("");
+    const [unidad_medida, setUnidadMedida] = useState("");
+    const [cantidad_paquete, setCantidadPaquete] = useState("");
     const [error, setError] = useState("");
 
     const handleSave = () => {
-    if (!nombre || !marca || !precio || !unidad_medida || !cantidad_paquete) {
-      setError("Todos los campos son obligatorios.");
-      return;
-    }
+        // Validación de campos vacíos
+        if (!nombre || !marca || !precio || !unidad_medida || !cantidad_paquete) {
+            setError("Todos los campos son obligatorios.");
+            show_alerta("Todos los campos son obligatorios.", "warning");
+            return;
+        }
 
-    // Limpiar el error si todos los campos están completos
-    setError("");
+        // Validación adicional para los campos de tipo float e int
+        if (isNaN(precio) || parseFloat(precio) <= 0) {
+            setError("El precio debe ser un número positivo.");
+            show_alerta("El precio debe ser un número positivo.", "warning");
+            return;
+        }
 
-    // Llamar al método de guardado con los valores de los campos
-    onSave({
-      nombre,
-      marca,
-      precio,
-      unidad_medida,
-      cantidad_paquete,
-    });
+        if (!Number.isInteger(Number(cantidad_paquete)) || parseInt(cantidad_paquete) <= 0) {
+            setError("La cantidad del paquete debe ser un número entero positivo.");
+            show_alerta("La cantidad del paquete debe ser un número entero positivo.", "warning");
+            return;
+        }
 
-    // Limpiar el formulario después de guardar
-    setNombre("");
-    setMarca("");
-    setPrecio("");
-    setUnidadMedida("");
-    setCantidadPaquete("");
+        // Validación para campos de texto: nombre, marca y unidad de medida
+        if (typeof nombre !== 'string' || nombre.trim().length === 0) {
+            setError("El nombre es inválido.");
+            show_alerta("El nombre es inválido.", "warning");
+            return;
+        }
+
+        if (typeof marca !== 'string' || marca.trim().length === 0) {
+            setError("La marca es inválida.");
+            show_alerta("La marca es inválida.", "warning");
+            return;
+        }
+
+        if (typeof unidad_medida !== 'string' || unidad_medida.trim().length === 0) {
+            setError("La unidad de medida es inválida.");
+            show_alerta("La unidad de medida es inválida.", "warning");
+            return;
+        }
+
+        // Limpiar el error si todos los campos están completos
+        setError("");
+        onSave({ nombre, marca, precio, unidad_medida, cantidad_paquete });
+
+        // Mostrar alerta de éxito después de guardar
+        show_alerta("Ingrediente guardado con éxito", "success");
+
+        // Limpiar campos del formulario
+        setNombre("");
+        setMarca("");
+        setPrecio("");
+        setUnidadMedida("");
+        setCantidadPaquete("");
     };
 
     return (
-        <div className='modal fade' id='modalIngredientes' aria-hidden='true'>
-        <div className='modal-dialog'>
-          <div className='modal-content'>
-            <div className='modal-header'>
-              <button type='button' className='btn-close' data-bs-dismiss='modal' aria-label='close'></button>
-            </div>
-            <div className='modal-body'>
-                {error && <div className="alert alert-danger">{error}</div>}
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><i className='fa-solid fa-comment'></i></span>
-                <input
-                  type='text'
-                  id='nombre'
-                  className='form-control'
-                  placeholder='Nombre'
-                  value={nombre}
-                  onChange={(e) => setNombre(e.target.value)}
-                ></input>
-              </div>
+        <Dialog open={open} onClose={onClose}>
+            <DialogTitle>Nuevo Ingrediente</DialogTitle>
+            <DialogContent>
+                {error && <Alert severity="error">{error}</Alert>}
 
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><i className='fa-solid fa-comment'></i></span>
-                <input
-                  type='text'
-                  id='marca'
-                  className='form-control'
-                  placeholder='Marca'
-                  value={marca}
-                  onChange={(e) => setMarca(e.target.value)}
-                ></input>
-              </div>
+                <TextField
+                    margin="dense"
+                    label="Nombre"
+                    fullWidth
+                    value={nombre}
+                    onChange={(e) => setNombre(e.target.value)}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <FontAwesomeIcon icon={faComment} />
+                            </InputAdornment>
+                        ),
+                    }}
+                />
 
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><i className='fa-solid fa-dollar'></i></span>
-                <input
-                  type='text'
-                  id='precio'
-                  className='form-control'
-                  placeholder='Precio'
-                  value={precio}
-                  onChange={(e) => setPrecio(e.target.value)}
-                ></input>
-              </div>
+                <TextField
+                    margin="dense"
+                    label="Marca"
+                    fullWidth
+                    value={marca}
+                    onChange={(e) => setMarca(e.target.value)}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <FontAwesomeIcon icon={faComment} />
+                            </InputAdornment>
+                        ),
+                    }}
+                />
 
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><i className='fa-solid fa-comment'></i></span>
-                <input
-                  type='text'
-                  id='unidad_medida'
-                  className='form-control'
-                  placeholder='Unidad medida'
-                  value={unidad_medida}
-                  onChange={(e) => setUnidadMedida(e.target.value)}
-                ></input>
-              </div>
+                <TextField
+                    margin="dense"
+                    label="Precio"
+                    fullWidth
+                    value={precio}
+                    onChange={(e) => setPrecio(e.target.value)}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <FontAwesomeIcon icon={faDollar} />
+                            </InputAdornment>
+                        ),
+                    }}
+                />
 
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><i className='fa-solid fa-comment'></i></span>
-                <input
-                  type='text'
-                  id='cantidad_paquete'
-                  className='form-control'
-                  placeholder='Cantidad paquete'
-                  value={cantidad_paquete}
-                  onChange={(e) => setCantidadPaquete(e.target.value)}
-                ></input>
-              </div>
+                <TextField
+                    margin="dense"
+                    label="Unidad de Medida"
+                    fullWidth
+                    value={unidad_medida}
+                    onChange={(e) => setUnidadMedida(e.target.value)}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <FontAwesomeIcon icon={faComment} />
+                            </InputAdornment>
+                        ),
+                    }}
+                />
 
-              <div className='d-grid col-e mx-auto'>
-              <button
-              type='button'
-              className='btn btn-success'
-              onClick={handleSave}
-                >
-                Guardar
-            </button>
-              </div>
-            </div>
-            <div className='modal-footer'>
-              <button
-                type='button'
-                id='btncerrar'
-                className='btn btn-secondary'
-                data-bs-dismiss='modal'
-                style={{ backgroundColor: 'gray' }}>Cerrar
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+                <TextField
+                    margin="dense"
+                    label="Cantidad por Paquete"
+                    fullWidth
+                    value={cantidad_paquete}
+                    onChange={(e) => setCantidadPaquete(e.target.value)}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <FontAwesomeIcon icon={faComment} />
+                            </InputAdornment>
+                        ),
+                    }}
+                />
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={handleSave} color="primary" variant="contained">
+                    Guardar
+                </Button>
+                <Button onClick={onClose} color="secondary" variant="contained">
+                    Cerrar
+                </Button>
+            </DialogActions>
+        </Dialog>
     );
 };
 

@@ -3,9 +3,9 @@ import '../css/main.css';
 
 const Home = () => {
   return (
-    <seccion className="main">
+    <section className="main">
 
-        <seccion className="opciones">
+        <section className="opciones">
 
             {/*Tiene como funcionalidad centrar en la pantalla*/}
             <div className="contenedor">
@@ -64,8 +64,8 @@ const Home = () => {
                       
               </div>
             </div>
-        </seccion>
-    </seccion>
+        </section>
+    </section>
   );
 };
 

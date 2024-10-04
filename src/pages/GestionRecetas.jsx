@@ -1,156 +1,249 @@
-// Estilos 
-import "bootstrap/dist/css/bootstrap.min.css"
-import "@fortawesome/fontawesome-free/css/all.min.css"
-import "bootstrap/dist/js/bootstrap.bundle"
-import 'postcss';
-import { ModalNuevaReceta } from '../components';
-import React,{ useEffect, useState } from 'react';
-import { useApiRequest } from '../hook/useApiRequest'; 
+import React, { useEffect, useState } from 'react';
+import {
+    Box,
+    Button,
+    TextField,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Typography,
+    Collapse,
+    Paper,
+    IconButton,
+    Modal
+} from '@mui/material';
+import ModalNuevaReceta from '../components/ModalNuevaReceta';
+import ModalAgregarIngredienteXReceta from '../components/ModalAgregarIngredienteXReceta';
+import { useApiRequest } from '../hook/useApiRequest';
+import AddIcon from '@mui/icons-material/Add';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 
 const GestionRecetas = () => {
-
     const [recetas, setRecetas] = useState([]);
-    const [nombreRecetaBuscada, setNombreRecetaBuscada] = useState(""); // Estado para almacenar el nombre de la receta que el usuario busca
-    const [expandedRow, setExpandedRow] = useState(null);
-    const [accordionData, setAccordionData] = useState([]);
-    const { data, isLoading, error } = useApiRequest(`${import.meta.env.VITE_BACKEND_API_URL}:${import.meta.env.VITE_BACKEND_API_PORT}/api/recetas`, 'GET');
-    
+    const [nombreRecetaBuscada, setNombreRecetaBuscada] = useState("");
+    const [recetasExpandidas, setRecetasExpandidas] = useState({});
+    const [ingredientesPorReceta, setIngredientesPorReceta] = useState({});
+    const [openModal, setOpenModal] = useState(false);
+    const [openModalIngredientes, setOpenModalIngredientes] = useState(false);
+    const [selectedRecetaId, setSelectedRecetaId] = useState(null);
+
+    const { data, isLoading, error } = useApiRequest(
+        `${import.meta.env.VITE_BACKEND_API_URL}:${import.meta.env.VITE_BACKEND_API_PORT}/api/recetas`,
+        'GET'
+    );
+
     useEffect(() => {
         if (!isLoading && !error) {
-        setRecetas(data); 
-          console.log(data);
+            setRecetas(data);
         }
-      }, [data, isLoading, error]);
+    }, [data, isLoading, error]);
 
-    // Filtrar las recetas si el usuario ha escrito algo en el campo de búsqueda
     const recetasFiltradas = recetas.filter(receta =>
         receta.nombreReceta.toLowerCase().includes(nombreRecetaBuscada.toLowerCase())
     );
 
-    const handleRowClick = async (id) => {
-        if (expandedRow === id) {
-            setExpandedRow(null);
-        } else {
-            setExpandedRow(id);
-            if (!accordionData[id]) {
-                try {
-                    const response = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}:${import.meta.env.VITE_BACKEND_API_PORT}/IngredientesXReceta/getxRecetaId=${id}`);
-                    const data = await response.json();
-                    setAccordionData(prevData => ({ ...prevData, [id]: data }));
-                } catch (error) {
-                    console.error(`Error fetching extra data for receta ${id}:`, error);
-                }
+    const toggleReceta = async (id) => {
+        setRecetasExpandidas(prevState => ({
+            ...prevState,
+            [id]: !prevState[id]
+        }));
+
+        if (!recetasExpandidas[id]) {
+            try {
+                const response = await fetch(`http://localhost:8080/api/IngredientesXReceta/getxRecetaId=${id}`);
+                const ingredientes = await response.json();
+                setIngredientesPorReceta(prevState => ({
+                    ...prevState,
+                    [id]: ingredientes
+                }));
+            } catch (error) {
+                console.error("Error al obtener los ingredientes:", error);
             }
         }
-
     };
 
+    const handleDeleteReceta = (id) => {
+        console.log(`Eliminar receta con id: ${id}`);
+    };
+
+    const handleDeleteIngrediente = (recetaId, ingredienteId) => {
+        console.log(`Eliminar ingrediente con id: ${ingredienteId} de la receta con id: ${recetaId}`);
+    };
+
+    const handleEditIngrediente = (recetaId, ingredienteId) => {
+        console.log(`Editar ingrediente con id: ${ingredienteId} de la receta con id: ${recetaId}`);
+    };
+
+    const handleOpenModal = () => setOpenModal(true);
+    const handleCloseModal = () => setOpenModal(false);
+
+    const handleOpenModalIngredientes = (recetaId) => {
+        setSelectedRecetaId(recetaId);
+        setOpenModalIngredientes(true);
+    };
+    const handleCloseModalIngredientes = () => setOpenModalIngredientes(false);
+
+    const handleSave = () => {
+        // Aquí puedes volver a hacer la llamada a la API para obtener las recetas actualizadas si es necesario
+        fetchRecetas(); // Puedes implementar esta función para actualizar el estado
+        handleCloseModal(); // Cerrar el modal después de guardar
+    };
 
     return (
-       
-        <div className='gestionRecetas my-5'>
-          <div className='container-fluid'>
-            <div className='row mt-3'>
-              <div className='col-md-4 offset-md-4'>
-                <div className='d-grid mx-auto mt-6'>
-                  <button className='btn btn-dark' data-bs-toggle="modal" data-bs-target="#modalRecetas">
-                    <i className='fa-solid fa-circle-plus'></i> Añadir Receta
-                  </button>
-                  <ModalNuevaReceta />
-                </div>
-              </div>
-            </div>
+        <Box sx={{ padding: 3 }}>
+            <Box display="flex" justifyContent="center" sx={{ mb: 2 }}>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<AddIcon />}
+                    onClick={handleOpenModal}
+                >
+                    Añadir Receta
+                </Button>
+            </Box>
 
-            <div className='row mt-3'>
-              <div className='col-12 col-lg-8 offset-lg-2'>
+            <ModalNuevaReceta open={openModal} handleClose={handleCloseModal} onSave={handleSave} />
 
-                {/* Campo de búsqueda */}
-                <input
-                  type="text"
-                  className="form-control mb-3"
-                  placeholder="Buscar receta por nombre"
-                  value={nombreRecetaBuscada} // Vincular el valor del input con el estado
-                  onChange={(e) => setNombreRecetaBuscada(e.target.value)} // Actualizar el nombre buscado
-                />
+            <Modal
+                open={openModalIngredientes}
+                onClose={handleCloseModalIngredientes}
+            >
+                <Box sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: 600,
+                    bgcolor: 'background.paper',
+                    boxShadow: 24,
+                    p: 4,
+                }}>
+                    <ModalAgregarIngredienteXReceta
+                        open={openModalIngredientes}
+                        handleClose={handleCloseModalIngredientes}
+                        recetaId={selectedRecetaId}
+                    />
+                </Box>
+            </Modal>
 
-    
-                <div className='table-responsive'>
-                  <table className='table table-bordered'>
-                    {/* Encabezado de la tabla */}
-                    <thead>
-                      <tr>
-                        <th>#</th>
-                        <th>Receta</th>
-                        <th>Descripcion</th>
-                        <th>Cantidad de porciones que rinde</th>
-                        <th>Costo total</th>
-                        <th>Costo por porcion</th>
-                        <th>Acciones</th>
-                      </tr>
-                    </thead>
+            <TextField
+                fullWidth
+                variant="outlined"
+                placeholder="Buscar receta por nombre"
+                value={nombreRecetaBuscada}
+                onChange={(e) => setNombreRecetaBuscada(e.target.value)}
+                sx={{ mb: 2 }}
+            />
 
-                    {/* Cuerpo de la tabla */}
-                    <tbody className='table-group-divider'>
-                      {recetasFiltradas.length > 0 ? (
-                        recetasFiltradas.map((receta, i) => (
-                        <React.Fragment key={receta.id}>
-                          <tr onClick={() => handleRowClick(receta.id)}>
-                            <td>{(i + 1)}</td>
-                            <td>{receta.nombreReceta}</td>
-                            <td>{receta.descripcion}</td>
-                            <td align="center">{receta.porcionesRinde}</td>
-                            <td style={{ color: 'green' }} ><strong>${receta.costoTotal}</strong></td>
-                            <td style={{ color: 'blue' }}><strong>${receta.costoPorPorcion}</strong></td>
-                            <td className='d-flex align-items-center'>                             
-                              
-                              <button 
-                                className='btn btn-warning me-2' data-bs-toggle='modal' data-bs-target='#modalRecetas'>
-                                <i className='fa-solid fa-edit'></i>
-                              </button>
-                              <button className='btn btn-danger'>
-                                <i className='fa-solid fa-trash'></i>
-                              </button>
-                            </td>
-                          </tr>
-                          {expandedRow === receta.id && (
-                            <tr>
-                                <td colSpan="7">
-                                    <div className="accordion-content">
-                                    {accordionData[receta.id] ? (
-                                        <p>Ingredientes: {JSON.stringify(accordionData[receta.id])}</p>
-                                    ) : (
-                                        <p>Cargando...</p>
-                                    )}
-                                    </div>
-                                </td>
-                            </tr>
+            <TableContainer component={Paper} sx={{ boxShadow: 3 }}>
+                <Table stickyHeader>
+                    <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
+                        <TableRow>
+                            <TableCell></TableCell>
+                            <TableCell><strong>Receta</strong></TableCell>
+                            <TableCell><strong>Descripción</strong></TableCell>
+                            <TableCell align="center"><strong>Porciones</strong></TableCell>
+                            <TableCell align="center"><strong>Costo Total</strong></TableCell>
+                            <TableCell align="center"><strong>Costo por Porción</strong></TableCell>
+                            <TableCell><strong>Acciones</strong></TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {recetasFiltradas.length > 0 ? (
+                            recetasFiltradas.map((receta) => (
+                                <React.Fragment key={receta.id}>
+                                    <TableRow onClick={() => toggleReceta(receta.id)} style={{ cursor: 'pointer', backgroundColor: recetasExpandidas[receta.id] ? '#e0f7fa' : 'white' }}>
+                                        <TableCell>
+                                            {recetasExpandidas[receta.id] ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                                        </TableCell>
+                                        <TableCell>{receta.nombreReceta}</TableCell>
+                                        <TableCell>{receta.descripcion}</TableCell>
+                                        <TableCell align="center">{receta.porcionesRinde}</TableCell>
+                                        <TableCell align="center" style={{ color: 'green' }}>
+                                            <strong>${receta.costoTotal.toFixed(2)}</strong>
+                                        </TableCell>
+                                        <TableCell align="center" style={{ color: 'blue' }}>
+                                            <strong>${receta.costoPorPorcion.toFixed(2)}</strong>
+                                        </TableCell>
+                                        <TableCell>
+                                            <IconButton color="error" onClick={() => handleDeleteReceta(receta.id)}>
+                                                <DeleteIcon />
+                                            </IconButton>
+                                            <IconButton color="primary" onClick={() => console.log(`Editar receta con id: ${receta.id}`)}>
+                                                <EditIcon />
+                                            </IconButton>
+                                            <IconButton color="secondary" onClick={() => handleOpenModalIngredientes(receta.id)}>
+                                                <AddCircleIcon />
+                                            </IconButton>
+                                        </TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell colSpan={7} style={{ padding: 0 }}>
+                                            <Collapse in={recetasExpandidas[receta.id]} timeout="auto" unmountOnExit>
+                                                <Box margin={1}>
+                                                    <Typography variant="h6">Ingredientes:</Typography>
+                                                    <Table>
+                                                        <TableHead>
+                                                            <TableRow>
+                                                                <TableCell><strong>Nombre</strong></TableCell>
+                                                                <TableCell align="center"><strong>Cantidad Utilizada en Receta</strong></TableCell>
+                                                                <TableCell align="center"><strong>Costo</strong></TableCell>
+                                                                <TableCell align="center"><strong>Marca</strong></TableCell>
+                                                                <TableCell align="center"><strong>Acciones</strong></TableCell>
+                                                            </TableRow>
+                                                        </TableHead>
+                                                        <TableBody>
+                                                            {ingredientesPorReceta[receta.id] && ingredientesPorReceta[receta.id].length > 0 ? (
+                                                                ingredientesPorReceta[receta.id].map((ingrediente) => (
+                                                                    <TableRow key={ingrediente.id}>
+                                                                        <TableCell>{ingrediente.nombre}</TableCell>
+                                                                        <TableCell align="center">{ingrediente.cantidad} gr </TableCell>
+                                                                        <TableCell align="center">${ingrediente.costo.toFixed(2)}</TableCell>
+                                                                        <TableCell align="center">{ingrediente.marca}</TableCell>
+                                                                        <TableCell align="center">
+                                                                            <IconButton color="primary" onClick={() => handleEditIngrediente(receta.id, ingrediente.id)}>
+                                                                                <EditIcon />
+                                                                            </IconButton>
+                                                                            <IconButton color="error" onClick={() => handleDeleteIngrediente(receta.id, ingrediente.id)}>
+                                                                                <DeleteIcon />
+                                                                            </IconButton>
+                                                                        </TableCell>
+                                                                    </TableRow>
+                                                                ))
+                                                            ) : (
+                                                                <TableRow>
+                                                                    <TableCell colSpan={5} align="center">
+                                                                        <Typography>No hay ingredientes para esta receta.</Typography>
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            )}
+                                                        </TableBody>
+                                                    </Table>
+                                                </Box>
+                                            </Collapse>
+                                        </TableCell>
+                                    </TableRow>
+                                </React.Fragment>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={7} align="center">
+                                    <Typography>No se encontraron recetas.</Typography>
+                                </TableCell>
+                            </TableRow>
                         )}
-                    </React.Fragment>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan="6" className='text-center'>No se encontraron recetas</td>
-                        </tr>
-                      )}
-                    </tbody>
-                    </table>
-                    </div>
-                    </div>
-                    </div>
-            {recetas.length === 0 && !isLoading && !error && (
-              <div className='row'>
-                <div className='col-12 text-center'>
-                  <div className="alert alert-info d-flex align-items-center justify-content-center mt-3" role="alert" style={{ backgroundColor: '#f8f9fa', border: '1px solid #b0bec5' }}>
-                    <i className="fa-solid fa-info-circle me-2"></i>
-                    <span>No hay recetas cargadas todavía. ¡Empieza añadiendo un nueva receta!</span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-          </div>    
-        </div>
-      )
-}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </Box>
+    );
+};
 
 export default GestionRecetas;
