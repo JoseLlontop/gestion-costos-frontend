@@ -3,7 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css"
 import "@fortawesome/fontawesome-free/css/all.min.css"
 import "bootstrap/dist/js/bootstrap.bundle"
 import 'postcss';
-
+import { ModalNuevoIngrediente } from '../components';
 import { useEffect, useState } from 'react';
 import { useApiRequest } from '../hook/useApiRequest';
 
@@ -13,12 +13,6 @@ const GestionIngredientes = () => {
     const [nombreIngredienteBuscado, setNombreIngredienteBuscado] = useState(""); // Estado para almacenar el nombre del ingrediente que el usuario busca
 
     const { data, isLoading, error } = useApiRequest(`${import.meta.env.VITE_BACKEND_API_URL}:${import.meta.env.VITE_BACKEND_API_PORT}/api/ingredientes/`, 'GET');
-    const [id, setId] = useState("");
-    const [nombre, setNombre] = useState("");
-    const [marca, setMarca] = useState("");
-    const [precio, setPrecio] = useState("");
-    const [unidad_medida, setUnidadMedida] = useState("");
-    const [cantidad_paquete, setCantidadPaquete] = useState("");
 
     useEffect(() => {
       if (!isLoading && !error) {
@@ -33,15 +27,15 @@ const GestionIngredientes = () => {
     );
 
     return (
-        <div className='gestionIngrdientes my-5'>
+        <div className='gestionIngredientes my-5'>
           <div className='container-fluid'>
-
             <div className='row mt-3'>
               <div className='col-md-4 offset-md-4'>
                 <div className='d-grid mx-auto mt-6'>
                   <button className='btn btn-dark' data-bs-toggle="modal" data-bs-target="#modalIngredientes">
                     <i className='fa-solid fa-circle-plus'></i> Añadir Ingrediente
                   </button>
+                  <ModalNuevoIngrediente />
                 </div>
               </div>
             </div>
@@ -106,94 +100,6 @@ const GestionIngredientes = () => {
                       )}
                     </tbody>
                   </table>
-                </div>
-              </div>
-            </div>
-          
-            <div id='modalIngredientes' className='modal fade' aria-hidden='true'>
-              <div className='modal-dialog'>
-                <div className='modal-content'>
-                  <div className='modal-header'>
-                    <button type='button' className='btn-close' data-bs-dismiss='modal' aria-label='close'></button>
-                  </div>
-                  <div className='modal-body'>
-                    <input type='hidden' id='id'></input>
-
-                    <div className='input-group mb-3'>
-                      <span className='input-group-text'><i className='fa-solid fa-comment'></i></span>
-                      <input
-                        type='text'
-                        id='nombre'
-                        className='form-control'
-                        placeholder='Nombre'
-                        value={nombre}
-                        onChange={(e) => setNombre(e.target.value)}
-                      ></input>
-                    </div>
-
-                    <div className='input-group mb-3'>
-                      <span className='input-group-text'><i className='fa-solid fa-comment'></i></span>
-                      <input
-                        type='text'
-                        id='marca'
-                        className='form-control'
-                        placeholder='Marca'
-                        value={marca}
-                        onChange={(e) => setMarca(e.target.value)}
-                      ></input>
-                    </div>
-
-                    <div className='input-group mb-3'>
-                      <span className='input-group-text'><i className='fa-solid fa-dollar'></i></span>
-                      <input
-                        type='text'
-                        id='precio'
-                        className='form-control'
-                        placeholder='Precio'
-                        value={precio}
-                        onChange={(e) => setPrecio(e.target.value)}
-                      ></input>
-                    </div>
-
-                    <div className='input-group mb-3'>
-                      <span className='input-group-text'><i className='fa-solid fa-comment'></i></span>
-                      <input
-                        type='text'
-                        id='unidad_medida'
-                        className='form-control'
-                        placeholder='Unidad medida'
-                        value={unidad_medida}
-                        onChange={(e) => setUnidadMedida(e.target.value)}
-                      ></input>
-                    </div>
-
-                    <div className='input-group mb-3'>
-                      <span className='input-group-text'><i className='fa-solid fa-comment'></i></span>
-                      <input
-                        type='text'
-                        id='cantidad_paquete'
-                        className='form-control'
-                        placeholder='Cantidad paquete'
-                        value={cantidad_paquete}
-                        onChange={(e) => setCantidadPaquete(e.target.value)}
-                      ></input>
-                    </div>
-
-                    <div className='d-grid col-e mx-auto'>
-                      <button className='btn btn-success'>
-                        <i className='fa-solid fa-floppy-disk'></i>&nbsp;&nbsp;Guardar
-                      </button>
-                    </div>
-                  </div>
-                  <div className='modal-footer'>
-                    <button
-                      type='button'
-                      id='btncerrar'
-                      className='btn btn-secondary'
-                      data-bs-dismiss='modal'
-                      style={{ backgroundColor: 'gray' }}>Cerrar
-                    </button>
-                  </div>
                 </div>
               </div>
             </div>
