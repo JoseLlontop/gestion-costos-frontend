@@ -59,7 +59,15 @@ const ModalNuevaReceta = () => {
         >
             <div className="modal-dialog">
                 <div className="modal-content">
-                    <div className="modal-header">
+                    <div
+                        className="modal-header"
+                        style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                        }}
+                    >
+                        <h5 className="modal-title">Nueva receta</h5>
                         <button
                             type="button"
                             className="btn-close"
@@ -119,7 +127,6 @@ const ModalNuevaReceta = () => {
                             onClick={handleSubmit}"
                         >
                             {" "}
-                            // conectar la funcion de envio
                             <i className="fa-solid fa-floppy-disk"></i>
                             &nbsp;&nbsp;Guardar
                         </button>
