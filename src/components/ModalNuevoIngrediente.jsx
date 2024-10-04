@@ -2,6 +2,9 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 import { useEffect, useState } from "react";
 import { useApiRequest } from "../hook/useApiRequest";
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+import { show_alerta } from '../helpers/funcionSweetAlert'
 
 const ModalNuevoIngrediente = ({ onSave }) => {
     const [nombre, setNombre] = useState([]);
@@ -42,6 +45,8 @@ const ModalNuevoIngrediente = ({ onSave }) => {
         setPrecio("");
         setUnidadMedida("");
         setCantidadPaquete("");
+
+        show_alerta('Producto guardado', 'success');
     };
 
     return (

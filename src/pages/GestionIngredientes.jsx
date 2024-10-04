@@ -6,6 +6,7 @@ import 'postcss';
 import { ModalNuevoIngrediente } from '../components';
 import { useEffect, useState } from 'react';
 import { useApiRequest } from '../hook/useApiRequest';
+import { show_alerta } from '../helpers/funcionSweetAlert'
 
 
 const GestionIngredientes = () => {
@@ -39,6 +40,8 @@ const GestionIngredientes = () => {
 
           if (!response.ok) {
               throw new Error('Error al guardar el ingrediente');
+          }else{
+            show_alerta('Ingrediente guardado', 'success');
           }
 
           // Actualiza la lista de ingredientes después de agregar el nuevo ingrediente
