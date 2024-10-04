@@ -3,12 +3,41 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useEffect, useState } from "react";
 import { useApiRequest } from "../hook/useApiRequest";
 
-const ModalNuevoIngrediente = () => {
+const ModalNuevoIngrediente = ({onSave}) => {
     const [nombre, setNombre] = useState([]);
     const [marca, setMarca] = useState([]);
     const [precio, setPrecio] = useState([]);
     const [unidad_medida, setUnidadMedida] = useState([]);
     const [cantidad_paquete, setCantidadPaquete] = useState([]);
+
+    const [error, setError] = useState("");
+
+    const handleSave = () => {
+    if (!nombre || !marca || !precio || !unidad_medida || !cantidad_paquete) {
+      setError("Todos los campos son obligatorios.");
+      return;
+    }
+
+    // Limpiar el error si todos los campos están completos
+    setError("");
+
+    // Llamar al método de guardado con los valores de los campos
+    onSave({
+      nombre,
+      marca,
+      precio,
+      unidad_medida,
+      cantidad_paquete,
+    });
+
+    // Limpiar el formulario después de guardar
+    setNombre("");
+    setMarca("");
+    setPrecio("");
+    setUnidadMedida("");
+    setCantidadPaquete("");
+    };
+
     return (
         <div className='modal fade' id='modalIngredientes' aria-hidden='true'>
         <div className='modal-dialog'>
@@ -17,8 +46,7 @@ const ModalNuevoIngrediente = () => {
               <button type='button' className='btn-close' data-bs-dismiss='modal' aria-label='close'></button>
             </div>
             <div className='modal-body'>
-              <input type='hidden' id='id'></input>
-
+                {error && <div className="alert alert-danger">{error}</div>}
               <div className='input-group mb-3'>
                 <span className='input-group-text'><i className='fa-solid fa-comment'></i></span>
                 <input
@@ -80,9 +108,13 @@ const ModalNuevoIngrediente = () => {
               </div>
 
               <div className='d-grid col-e mx-auto'>
-                <button className='btn btn-success'>
-                  <i className='fa-solid fa-floppy-disk'></i>&nbsp;&nbsp;Guardar
-                </button>
+              <button
+              type='button'
+              className='btn btn-success'
+              onClick={handleSave}
+                >
+                Guardar
+            </button>
               </div>
             </div>
             <div className='modal-footer'>

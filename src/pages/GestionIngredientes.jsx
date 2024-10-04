@@ -7,6 +7,7 @@ import { ModalNuevoIngrediente } from '../components';
 import { useEffect, useState } from 'react';
 import { useApiRequest } from '../hook/useApiRequest';
 
+
 const GestionIngredientes = () => {
 
     const [ingredientes, setIngredientes] = useState([]);
@@ -26,6 +27,28 @@ const GestionIngredientes = () => {
       ingrediente.nombre.toLowerCase().includes(nombreIngredienteBuscado.toLowerCase())
     );
 
+    const handleSaveIngrediente = async (nuevoIngrediente) => {
+      try {
+          const response = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}:${import.meta.env.VITE_BACKEND_API_PORT}/api/ingredientes/crear`, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(nuevoIngrediente)
+          });
+
+          if (!response.ok) {
+              throw new Error('Error al guardar el ingrediente');
+          }
+
+          // Actualiza la lista de ingredientes después de agregar el nuevo ingrediente
+          const ingredienteAgregado = await response.json();
+          setIngredientes([...ingredientes, ingredienteAgregado]);
+      } catch (error) {
+          console.error('Error de conexión', error);
+      }
+    };
+
     return (
         <div className='gestionIngredientes my-5'>
           <div className='container-fluid'>
@@ -35,7 +58,7 @@ const GestionIngredientes = () => {
                   <button className='btn btn-dark' data-bs-toggle="modal" data-bs-target="#modalIngredientes">
                     <i className='fa-solid fa-circle-plus'></i> Añadir Ingrediente
                   </button>
-                  <ModalNuevoIngrediente />
+                  <ModalNuevoIngrediente onSave={handleSaveIngrediente}/>
                 </div>
               </div>
             </div>
