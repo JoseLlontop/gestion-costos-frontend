@@ -10,7 +10,7 @@ const ModalNuevoIngrediente = () => {
     const [unidad_medida, setUnidadMedida] = useState([]);
     const [cantidad_paquete, setCantidadPaquete] = useState([]);
     return (
-        <div className='modal fade' aria-hidden='true'>
+        <div className='modal fade' id='modalIngredientes' aria-hidden='true'>
         <div className='modal-dialog'>
           <div className='modal-content'>
             <div className='modal-header'>
