@@ -4,14 +4,15 @@ import "@fortawesome/fontawesome-free/css/all.min.css"
 import "bootstrap/dist/js/bootstrap.bundle"
 import 'postcss';
 import { ModalNuevaReceta } from '../components';
-import { useEffect, useState } from 'react';
+import React,{ useEffect, useState } from 'react';
 import { useApiRequest } from '../hook/useApiRequest'; 
 
 const GestionRecetas = () => {
 
     const [recetas, setRecetas] = useState([]);
     const [nombreRecetaBuscada, setNombreRecetaBuscada] = useState(""); // Estado para almacenar el nombre de la receta que el usuario busca
-
+    const [expandedRow, setExpandedRow] = useState(null);
+    const [accordionData, setAccordionData] = useState([]);
     const { data, isLoading, error } = useApiRequest(`${import.meta.env.VITE_BACKEND_API_URL}:${import.meta.env.VITE_BACKEND_API_PORT}/api/recetas`, 'GET');
     
     useEffect(() => {
@@ -25,6 +26,24 @@ const GestionRecetas = () => {
     const recetasFiltradas = recetas.filter(receta =>
         receta.nombreReceta.toLowerCase().includes(nombreRecetaBuscada.toLowerCase())
     );
+
+    const handleRowClick = async (id) => {
+        if (expandedRow === id) {
+            setExpandedRow(null);
+        } else {
+            setExpandedRow(id);
+            if (!accordionData[id]) {
+                try {
+                    const response = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}:${import.meta.env.VITE_BACKEND_API_PORT}/IngredientesXReceta/getxRecetaId=${id}`);
+                    const data = await response.json();
+                    setAccordionData(prevData => ({ ...prevData, [id]: data }));
+                } catch (error) {
+                    console.error(`Error fetching extra data for receta ${id}:`, error);
+                }
+            }
+        }
+
+    };
 
 
     return (
@@ -74,7 +93,8 @@ const GestionRecetas = () => {
                     <tbody className='table-group-divider'>
                       {recetasFiltradas.length > 0 ? (
                         recetasFiltradas.map((receta, i) => (
-                          <tr key={receta.id}>
+                        <React.Fragment key={receta.id}>
+                          <tr onClick={() => handleRowClick(receta.id)}>
                             <td>{(i + 1)}</td>
                             <td>{receta.nombreReceta}</td>
                             <td>{receta.descripcion}</td>
@@ -91,8 +111,21 @@ const GestionRecetas = () => {
                                 <i className='fa-solid fa-trash'></i>
                               </button>
                             </td>
-
                           </tr>
+                          {expandedRow === receta.id && (
+                            <tr>
+                                <td colSpan="7">
+                                    <div className="accordion-content">
+                                    {accordionData[receta.id] ? (
+                                        <p>Ingredientes: {JSON.stringify(accordionData[receta.id])}</p>
+                                    ) : (
+                                        <p>Cargando...</p>
+                                    )}
+                                    </div>
+                                </td>
+                            </tr>
+                        )}
+                    </React.Fragment>
                         ))
                       ) : (
                         <tr>
