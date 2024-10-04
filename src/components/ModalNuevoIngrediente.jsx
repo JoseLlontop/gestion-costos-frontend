@@ -27,6 +27,33 @@ const ModalNuevoIngrediente = ({ onSave }) => {
             return;
         }
 
+        // Validación adicional para los campos de tipo float e int
+        if (isNaN(precio) || parseFloat(precio) <= 0) {
+            setError("El precio debe ser un número positivo.");
+            return;
+        }
+
+        if (!Number.isInteger(Number(cantidad_paquete)) || parseInt(cantidad_paquete) <= 0) {
+            setError("La cantidad del paquete debe ser un número entero positivo.");
+            return;
+        }
+
+        // Validación para campos de texto: nombre, marca y unidad de medida
+        if (typeof nombre !== 'string' || nombre.trim().length === 0) {
+            setError("El nombre es inválido.");
+            return;
+        }
+
+        if (typeof marca !== 'string' || marca.trim().length === 0) {
+            setError("La marca es inválida.");
+            return;
+        }
+
+        if (typeof unidad_medida !== 'string' || unidad_medida.trim().length === 0) {
+            setError("La unidad de medida es inválida.");
+            return;
+        }
+
         // Limpiar el error si todos los campos están completos
         setError("");
 
@@ -34,9 +61,9 @@ const ModalNuevoIngrediente = ({ onSave }) => {
         onSave({
             nombre,
             marca,
-            precio,
+            precio: parseFloat(precio),
             unidad_medida,
-            cantidad_paquete,
+            cantidad_paquete: parseInt(cantidad_paquete),
         });
 
         // Limpiar el formulario después de guardar
