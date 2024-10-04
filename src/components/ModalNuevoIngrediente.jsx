@@ -46,7 +46,6 @@ const ModalNuevoIngrediente = ({ onSave }) => {
         setUnidadMedida("");
         setCantidadPaquete("");
 
-        show_alerta('Producto guardado', 'success');
     };
 
     return (
