@@ -3,7 +3,7 @@ import { Box, Button, TextField, Typography, Modal, IconButton, Alert, InputAdor
 import CloseIcon from '@mui/icons-material/Close';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faComment, faUtensils, faListOl } from "@fortawesome/free-solid-svg-icons";
-import { show_alerta } from '../helpers/functionSweetAlert'; 
+import { show_alerta } from '../helpers/funcionSweetAlert'; 
 import ModalAgregarIngredienteXReceta from './ModalAgregarIngredienteXReceta';
 
 const ModalNuevaReceta = ({ open, handleClose }) => {

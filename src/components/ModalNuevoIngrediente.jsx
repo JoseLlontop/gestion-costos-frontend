@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faComment, faDollar } from "@fortawesome/free-solid-svg-icons";
-import { show_alerta } from '../helpers/functionSweetAlert'; // Importa show_alerta
+import { show_alerta } from '../helpers/funcionSweetAlert'; // Importa show_alerta
 
 const ModalNuevoIngrediente = ({ open, onClose, onSave }) => {
     const [nombre, setNombre] = useState("");

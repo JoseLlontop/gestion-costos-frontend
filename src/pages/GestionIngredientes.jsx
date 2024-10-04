@@ -5,6 +5,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import ModalNuevoIngrediente from '../components/ModalNuevoIngrediente';
 import { useApiRequest } from '../hook/useApiRequest';
+import { show_alerta } from '../helpers/funcionSweetAlert'
 
 const GestionIngredientes = () => {
   const [ingredientes, setIngredientes] = useState([]);
