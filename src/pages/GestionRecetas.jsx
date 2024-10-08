@@ -24,6 +24,7 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import { show_alerta } from '../helpers/funcionSweetAlert';
 
 const GestionRecetas = () => {
     const [recetas, setRecetas] = useState([]);
@@ -41,7 +42,7 @@ const GestionRecetas = () => {
 
     useEffect(() => {
         if (!isLoading && !error) {
-            setRecetas(data);
+            setRecetas(Array.isArray(data) ? data : []);
         }
     }, [data, isLoading, error]);
 
@@ -59,6 +60,7 @@ const GestionRecetas = () => {
             try {
                 const response = await fetch(`http://localhost:8080/api/IngredientesXReceta/getxRecetaId=${id}`);
                 const ingredientes = await response.json();
+                
                 setIngredientesPorReceta(prevState => ({
                     ...prevState,
                     [id]: ingredientes
@@ -69,8 +71,22 @@ const GestionRecetas = () => {
         }
     };
 
-    const handleDeleteReceta = (id) => {
-        console.log(`Eliminar receta con id: ${id}`);
+    const handleDeleteReceta = async (id) => {
+        try {
+            const response = await fetch(`http://localhost:8080/api/recetas/${id}`, {
+                method: 'DELETE',
+            });
+
+            if (response.ok) {
+                setRecetas(prevRecetas => prevRecetas.filter(receta => receta.id !== id));
+                show_alerta("Receta eliminada con éxito", "success");
+            } else {
+                show_alerta("Error al eliminar la receta", "error");
+            }
+        } catch (error) {
+            console.error("Error al eliminar la receta:", error);
+            show_alerta("Ocurrió un error inesperado.", "error");
+        }
     };
 
     const handleDeleteIngrediente = (recetaId, ingredienteId) => {
@@ -204,7 +220,7 @@ const GestionRecetas = () => {
                                                                 ingredientesPorReceta[receta.id].map((ingrediente) => (
                                                                     <TableRow key={ingrediente.id}>
                                                                         <TableCell>{ingrediente.nombre}</TableCell>
-                                                                        <TableCell align="center">{ingrediente.cantidad} gr </TableCell>
+                                                                        <TableCell align="center">{ingrediente.cantidad} gr</TableCell>
                                                                         <TableCell align="center">${ingrediente.costo.toFixed(2)}</TableCell>
                                                                         <TableCell align="center">{ingrediente.marca}</TableCell>
                                                                         <TableCell align="center">
@@ -242,6 +258,8 @@ const GestionRecetas = () => {
                     </TableBody>
                 </Table>
             </TableContainer>
+
+       
         </Box>
     );
 };
