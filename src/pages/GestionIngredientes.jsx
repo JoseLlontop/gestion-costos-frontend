@@ -5,7 +5,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import ModalNuevoIngrediente from '../components/ModalNuevoIngrediente';
 import { useApiRequest } from '../hook/useApiRequest';
-import { show_alerta } from '../helpers/funcionSweetAlert'
+import { show_alerta } from '../helpers/funcionSweetAlert';
 
 const GestionIngredientes = () => {
   const [ingredientes, setIngredientes] = useState([]);
@@ -44,6 +44,25 @@ const GestionIngredientes = () => {
       setOpenModal(false); // Cerrar el modal después de guardar
     } catch (error) {
       console.error('Error de conexión', error);
+    }
+  };
+
+  // Eliminar un ingrediente
+  const handleDeleteIngrediente = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/ingredientes/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setIngredientes(prevIngredientes => prevIngredientes.filter(ingrediente => ingrediente.id !== id));
+        show_alerta("Ingrediente eliminado con éxito", "success");
+      } else {
+        show_alerta("Error al eliminar el ingrediente", "error");
+      }
+    } catch (error) {
+      console.error("Error al eliminar el ingrediente:", error);
+      show_alerta("Ocurrió un error inesperado.", "error");
     }
   };
 
