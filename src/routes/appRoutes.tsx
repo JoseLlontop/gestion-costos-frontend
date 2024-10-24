@@ -2,9 +2,11 @@ import HomePage from "../pages/home/HomePage";
 import { RouteType } from "./config";
 import DinnerDiningIcon from '@mui/icons-material/DinnerDining';
 import InfoIcon from '@mui/icons-material/Info';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import GestionRecetas from "../pages/recetas/GestionRecetas";
 import GestionIngredientes from "../pages/ingredientes/GestionIngredientes";
+import GestionGanancia from "../pages/costos/GestionGanancia";
 
 const appRoutes: RouteType[] = [
   {
@@ -55,6 +57,26 @@ const appRoutes: RouteType[] = [
         state: "gestionIngredientes.gestion",
         sidebarProps: {
           displayText: "Gestion Ingredientes"
+        }
+      }
+    ]
+  },
+
+  {
+    path: "/gestionGanancia",
+    element: <GestionGanancia />,
+    state: "gestionGanancia",
+    sidebarProps: {
+      displayText: "Ganancia",
+      icon: <MonetizationOnIcon />
+    },
+    child: [
+      {
+        path: "/gestionGanancia/gestion",
+        element: <GestionGanancia />,
+        state: "gestionGanancia.gestion",
+        sidebarProps: {
+          displayText: "Calcular Ganancia"
         }
       }
     ]
