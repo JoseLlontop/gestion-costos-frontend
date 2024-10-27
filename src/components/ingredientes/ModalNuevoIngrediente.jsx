@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     Dialog,
     DialogTitle,
@@ -13,7 +13,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faComment, faDollar } from "@fortawesome/free-solid-svg-icons";
 import { show_alerta } from '../../helpers/funcionSweetAlert'; // Importa show_alerta
 
-const ModalNuevoIngrediente = ({ open, onClose, onSave }) => {
+const ModalNuevoIngrediente = ({ open, onClose, onSave, ingrediente }) => {
     const [nombre, setNombre] = useState("");
     const [marca, setMarca] = useState("");
     const [precio, setPrecio] = useState("");
@@ -21,52 +21,60 @@ const ModalNuevoIngrediente = ({ open, onClose, onSave }) => {
     const [cantidad_paquete, setCantidadPaquete] = useState("");
     const [error, setError] = useState("");
 
+    useEffect(() => {
+        // Si hay un ingrediente, cargar sus datos en el formulario
+        if (ingrediente) {
+            setNombre(ingrediente.nombre);
+            setMarca(ingrediente.marca);
+            setPrecio(ingrediente.precio.toString());
+            setUnidadMedida(ingrediente.unidad_medida);
+            setCantidadPaquete(ingrediente.cantidad_paquete.toString());
+        } else {
+            // Si no hay ingrediente, limpiar el formulario
+            setNombre("");
+            setMarca("");
+            setPrecio("");
+            setUnidadMedida("");
+            setCantidadPaquete("");
+        }
+    }, [ingrediente]);
+
     const handleSave = () => {
-        // Validación de campos vacíos
+        const parsedPrecio = parseFloat(precio);
+        const parsedCantidadPaquete = parseInt(cantidad_paquete);
+
         if (!nombre || !marca || !precio || !unidad_medida || !cantidad_paquete) {
             setError("Todos los campos son obligatorios.");
             show_alerta("Todos los campos son obligatorios.", "warning");
             return;
         }
 
-        // Validación adicional para los campos de tipo float e int
-        if (isNaN(precio) || parseFloat(precio) <= 0) {
+        if (isNaN(parsedPrecio) || parsedPrecio <= 0) {
             setError("El precio debe ser un número positivo.");
             show_alerta("El precio debe ser un número positivo.", "warning");
             return;
         }
 
-        if (!Number.isInteger(Number(cantidad_paquete)) || parseInt(cantidad_paquete) <= 0) {
+        if (isNaN(parsedCantidadPaquete) || parsedCantidadPaquete <= 0) {
             setError("La cantidad del paquete debe ser un número entero positivo.");
             show_alerta("La cantidad del paquete debe ser un número entero positivo.", "warning");
             return;
         }
 
-        // Validación para campos de texto: nombre, marca y unidad de medida
-        if (typeof nombre !== 'string' || nombre.trim().length === 0) {
-            setError("El nombre es inválido.");
-            show_alerta("El nombre es inválido.", "warning");
-            return;
-        }
-
-        if (typeof marca !== 'string' || marca.trim().length === 0) {
-            setError("La marca es inválida.");
-            show_alerta("La marca es inválida.", "warning");
-            return;
-        }
-
-        if (typeof unidad_medida !== 'string' || unidad_medida.trim().length === 0) {
-            setError("La unidad de medida es inválida.");
-            show_alerta("La unidad de medida es inválida.", "warning");
-            return;
-        }
-
-        // Limpiar el error si todos los campos están completos
         setError("");
-        onSave({ nombre, marca, precio, unidad_medida, cantidad_paquete });
+        
+        // Llamar a onSave con los datos del ingrediente
+        onSave({
+            id: ingrediente?.id || null, // Incluye el ID solo si es edición
+            nombre,
+            marca,
+            precio: parsedPrecio,
+            unidad_medida,
+            cantidad_paquete: parsedCantidadPaquete,
+        });
 
-        // Mostrar alerta de éxito después de guardar
-        show_alerta("Ingrediente guardado con éxito", "success");
+        // Mostrar alerta de éxito después de guardar o actualizar
+        show_alerta(ingrediente ? "Ingrediente actualizado con éxito" : "Ingrediente guardado con éxito", "success");
 
         // Limpiar campos del formulario
         setNombre("");
@@ -78,7 +86,7 @@ const ModalNuevoIngrediente = ({ open, onClose, onSave }) => {
 
     return (
         <Dialog open={open} onClose={onClose}>
-            <DialogTitle>Nuevo Ingrediente</DialogTitle>
+            <DialogTitle>{ingrediente ? "Editar Ingrediente" : "Nuevo Ingrediente"}</DialogTitle>
             <DialogContent>
                 {error && <Alert severity="error">{error}</Alert>}
 
@@ -159,7 +167,7 @@ const ModalNuevoIngrediente = ({ open, onClose, onSave }) => {
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleSave} color="primary" variant="contained">
-                    Guardar
+                    {ingrediente ? "Actualizar" : "Guardar"}
                 </Button>
                 <Button onClick={onClose} color="secondary" variant="contained">
                     Cerrar
