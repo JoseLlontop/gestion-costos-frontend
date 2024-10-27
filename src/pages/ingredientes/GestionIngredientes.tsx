@@ -24,7 +24,8 @@ const GestionIngredientes = () => {
 
   const API_URL = "http://localhost:8080";
 
-  const { data, isLoading, error } = useApiRequest(`${API_URL}/api/ingredientes/`, 'GET');
+  // Usa el tipo genérico <Ingrediente[]> para que TypeScript sepa que `data` es un array de ingredientes
+  const { data, isLoading, error } = useApiRequest<Ingrediente[]>(`${API_URL}/api/ingredientes/`, 'GET');
 
   useEffect(() => {
     if (!isLoading && !error) {
