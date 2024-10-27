@@ -19,7 +19,8 @@ interface Ingrediente {
 const GestionIngredientes = () => {
   const [ingredientes, setIngredientes] = useState<Ingrediente[]>([]);
   const [nombreIngredienteBuscado, setNombreIngredienteBuscado] = useState("");
-  const [openModal, setOpenModal] = useState(false); // Estado para controlar la apertura del modal
+  const [openModal, setOpenModal] = useState(false);
+  const [currentIngrediente, setCurrentIngrediente] = useState<Ingrediente | null>(null); // Estado para el ingrediente en edición
 
   const API_URL = "http://localhost:8080";
 
@@ -35,26 +36,44 @@ const GestionIngredientes = () => {
     ingrediente.nombre?.toLowerCase().includes(nombreIngredienteBuscado.toLowerCase())
   );
 
-  // Guardar un nuevo ingrediente
-  const handleSaveIngrediente = async (nuevoIngrediente: Ingrediente) => {
+  // Guardar o modificar un ingrediente
+  const handleSaveIngrediente = async (ingrediente: Ingrediente) => {
     try {
-      const response = await fetch(`${API_URL}/api/ingredientes/crear`, {
-        method: 'POST',
+      const url = ingrediente.id
+        ? `${API_URL}/api/ingredientes/${ingrediente.id}` // Si tiene ID, es una actualización
+        : `${API_URL}/api/ingredientes/crear`; // Si no tiene ID, es una creación
+
+      const method = ingrediente.id ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method: method,
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(nuevoIngrediente)
+        body: JSON.stringify(ingrediente),
       });
 
       if (!response.ok) {
         throw new Error('Error al guardar el ingrediente');
       }
 
-      const ingredienteAgregado = await response.json();
-      setIngredientes([...ingredientes, ingredienteAgregado]);
+      const ingredienteGuardado = await response.json();
+
+      // Actualizar el estado de los ingredientes
+      setIngredientes((prevIngredientes) =>
+        ingrediente.id
+          ? prevIngredientes.map((item) =>
+              item.id === ingrediente.id ? ingredienteGuardado : item
+            )
+          : [...prevIngredientes, ingredienteGuardado]
+      );
+
       setOpenModal(false); // Cerrar el modal después de guardar
+      setCurrentIngrediente(null); // Limpiar el ingrediente actual
+      show_alerta(ingrediente.id ? "Ingrediente modificado con éxito" : "Ingrediente guardado con éxito", "success");
     } catch (error) {
-      console.error('Error de conexión', error);
+      console.error('Error al guardar el ingrediente', error);
+      show_alerta("Ocurrió un error al guardar el ingrediente.", "error");
     }
   };
 
@@ -77,6 +96,18 @@ const GestionIngredientes = () => {
     }
   };
 
+  // Abrir el modal para editar un ingrediente existente
+  const handleEditIngrediente = (ingrediente: Ingrediente) => {
+    setCurrentIngrediente(ingrediente); // Establece el ingrediente actual para editar
+    setOpenModal(true); // Abre el modal
+  };
+
+  // Cerrar el modal y limpiar el ingrediente actual
+  const handleCloseModal = () => {
+    setCurrentIngrediente(null); // Limpiar el ingrediente actual
+    setOpenModal(false); // Cerrar el modal
+  };
+
   return (
     <Box sx={{ padding: 3 }}>
       <Box display="flex" justifyContent="center" sx={{ mb: 2 }}>
@@ -84,16 +115,20 @@ const GestionIngredientes = () => {
           variant="contained"
           color="primary"
           startIcon={<AddIcon />}
-          onClick={() => setOpenModal(true)} // Abre el modal
+          onClick={() => {
+            setCurrentIngrediente(null); // Limpiar el ingrediente actual al agregar uno nuevo
+            setOpenModal(true); // Abre el modal
+          }}
         >
           Añadir Ingrediente
         </Button>
 
-        {/* Modal para añadir nuevo ingrediente */}
+        {/* Modal para añadir o editar ingrediente */}
         <ModalNuevoIngrediente
-          open={openModal} // Controla la apertura del modal
-          onClose={() => setOpenModal(false)} // Cierra el modal
+          open={openModal}
+          onClose={handleCloseModal}
           onSave={handleSaveIngrediente}
+          ingrediente={currentIngrediente} // Pasar el ingrediente actual al modal
         />
       </Box>
 
@@ -127,10 +162,10 @@ const GestionIngredientes = () => {
                   <TableCell>{ingrediente.nombre}</TableCell>
                   <TableCell>{ingrediente.cantidad_paquete}</TableCell>
                   <TableCell>{ingrediente.unidad_medida}</TableCell>
-                  <TableCell>${new Intl.NumberFormat("es-mx").format(ingrediente.precio)}</TableCell>
+                  <TableCell>${new Intl.NumberFormat("es-MX").format(ingrediente.precio)}</TableCell>
                   <TableCell>{ingrediente.marca}</TableCell>
                   <TableCell>
-                    <IconButton color="warning">
+                    <IconButton color="primary" onClick={() => handleEditIngrediente(ingrediente)}>
                       <EditIcon />
                     </IconButton>
                     <IconButton color="error" onClick={() => handleDeleteIngrediente(ingrediente.id)}>
