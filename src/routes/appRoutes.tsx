@@ -7,6 +7,7 @@ import MenuBookIcon from '@mui/icons-material/MenuBook';
 import GestionRecetas from "../pages/recetas/GestionRecetas";
 import GestionIngredientes from "../pages/ingredientes/GestionIngredientes";
 import GestionGanancia from "../pages/costos/GestionGanancia";
+import GestionCostosAdicionales from "../pages/costos/GestionCostosAdicionales";
 
 const appRoutes: RouteType[] = [
   {
@@ -63,6 +64,26 @@ const appRoutes: RouteType[] = [
   },
 
   {
+    path: "/gestionCostosAdicionales",
+    element: <GestionCostosAdicionales />,
+    state: "gestionCostosAdicionales",
+    sidebarProps: {
+      displayText: "Costos Adicionales",
+      icon: <MonetizationOnIcon />
+    },
+    child: [
+      {
+        path: "/gestionCostosAdicionales/gestion",
+        element: <GestionCostosAdicionales />,
+        state: "gestionCostosAdicionales.gestion",
+        sidebarProps: {
+          displayText: "Gestion Costos Adicionales"
+        }
+      }
+    ]
+  },
+
+  {
     path: "/gestionGanancia",
     element: <GestionGanancia />,
     state: "gestionGanancia",
@@ -81,6 +102,7 @@ const appRoutes: RouteType[] = [
       }
     ]
   }
+  
 ];
 
 export default appRoutes;
