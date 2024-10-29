@@ -4,6 +4,7 @@ import DinnerDiningIcon from '@mui/icons-material/DinnerDining';
 import InfoIcon from '@mui/icons-material/Info';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
+import Payments from '@mui/icons-material/Payments';
 import GestionRecetas from "../pages/recetas/GestionRecetas";
 import GestionIngredientes from "../pages/ingredientes/GestionIngredientes";
 import GestionGanancia from "../pages/costos/GestionGanancia";
@@ -69,7 +70,7 @@ const appRoutes: RouteType[] = [
     state: "gestionCostosAdicionales",
     sidebarProps: {
       displayText: "Costos Adicionales",
-      icon: <MonetizationOnIcon />
+      icon: <Payments />
     },
     child: [
       {
