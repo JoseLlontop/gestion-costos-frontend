@@ -1,10 +1,25 @@
 import React, { useState } from "react";
-import { Box, Button, TextField, Typography, Modal, IconButton, Alert, InputAdornment } from "@mui/material";
-import CloseIcon from '@mui/icons-material/Close';
+import {
+    Box,
+    Button,
+    TextField,
+    Typography,
+    Modal,
+    IconButton,
+    Alert,
+    InputAdornment,
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faComment, faUtensils, faListOl } from "@fortawesome/free-solid-svg-icons";
-import { show_alerta } from '../../helpers/funcionSweetAlert';
-import ModalAgregarIngredienteXReceta from './ModalAgregarIngredienteXReceta';
+import {
+    faComment,
+    faUtensils,
+    faListOl,
+    faPercent,
+} from "@fortawesome/free-solid-svg-icons";
+import { show_alerta } from "../../helpers/funcionSweetAlert";
+import ModalAgregarIngredienteXReceta from "./ModalAgregarIngredienteXReceta";
+import PercentIcon from "@mui/icons-material/Percent";
 
 const ModalNuevaReceta = ({ open, handleClose, ...props }) => {
     const [nombre, setNombre] = useState("");
@@ -13,6 +28,7 @@ const ModalNuevaReceta = ({ open, handleClose, ...props }) => {
     const [mensaje, setMensaje] = useState(""); // Estado para manejar la respuesta y el mensaje de éxito/error
     const [recetaId, setRecetaId] = useState(null);
     const [modalIngredientesOpen, setModalIngredientesOpen] = useState(false);
+    const [porcentajeGanancia, setPorcentajeGanancia] = useState("");
 
     const API_URL = "http://localhost:8080";
 
@@ -25,20 +41,18 @@ const ModalNuevaReceta = ({ open, handleClose, ...props }) => {
             nombreReceta: nombre,
             descripcion: descripcion,
             porcionesRinde: parseInt(porcionesRinde), // convierte a int
+            porcentajeGanancia: porcentajeGanancia,
         };
 
         try {
             // Realizar la solicitud POST al backend
-            const response = await fetch(
-                `${API_URL}/api/recetas/crear`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json", // indicar que se envia un json
-                    },
-                    body: JSON.stringify(nuevaReceta), //convierte el objeto a JSON
-                }
-            );
+            const response = await fetch(`${API_URL}/api/recetas/crear`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json", // indicar que se envia un json
+                },
+                body: JSON.stringify(nuevaReceta), //convierte el objeto a JSON
+            });
 
             if (response.ok) {
                 const data = await response.json();
@@ -49,6 +63,7 @@ const ModalNuevaReceta = ({ open, handleClose, ...props }) => {
                 setNombre("");
                 setDescripcion("");
                 setPorcionesRinde("");
+                setPorcentajeGanancia("");
                 // Cerrar el modal después de guardar
                 handleClose();
                 // Abrir el modal para agregar ingredientes
@@ -71,17 +86,23 @@ const ModalNuevaReceta = ({ open, handleClose, ...props }) => {
     return (
         <>
             <Modal open={open} onClose={handleClose}>
-                <Box sx={{ 
-                    position: 'absolute', 
-                    top: '50%', 
-                    left: '50%', 
-                    transform: 'translate(-50%, -50%)', 
-                    width: 400, 
-                    bgcolor: 'background.paper', 
-                    boxShadow: 24, 
-                    p: 4 
-                }}>
-                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Box
+                    sx={{
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        width: 400,
+                        bgcolor: "background.paper",
+                        boxShadow: 24,
+                        p: 4,
+                    }}
+                >
+                    <Box
+                        display="flex"
+                        justifyContent="space-between"
+                        alignItems="center"
+                    >
                         <Typography variant="h6" component="h2">
                             Añadir Nueva Receta
                         </Typography>
@@ -89,7 +110,11 @@ const ModalNuevaReceta = ({ open, handleClose, ...props }) => {
                             <CloseIcon />
                         </IconButton>
                     </Box>
-                    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
+                    <Box
+                        component="form"
+                        onSubmit={handleSubmit}
+                        sx={{ mt: 2 }}
+                    >
                         <TextField
                             fullWidth
                             label="Nombre"
@@ -135,8 +160,27 @@ const ModalNuevaReceta = ({ open, handleClose, ...props }) => {
                                 ),
                             }}
                         />
+                        <TextField
+                            fullWidth
+                            label="Porcentaje de Ganancia"
+                            variant="outlined"
+                            value={porcentajeGanancia}
+                            onChange={(e) =>
+                                setPorcentajeGanancia(e.target.value)
+                            }
+                            sx={{ mb: 2 }}
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <FontAwesomeIcon icon={faPercent} />
+                                    </InputAdornment>
+                                ),
+                            }}
+                        />
                         {mensaje && (
-                            <Alert severity="info" sx={{ mb: 2 }}>{mensaje}</Alert>
+                            <Alert severity="info" sx={{ mb: 2 }}>
+                                {mensaje}
+                            </Alert>
                         )}
                         <Button
                             type="submit"

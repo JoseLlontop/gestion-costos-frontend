@@ -1,4 +1,3 @@
-
 export interface Receta {
     id: number;
     nombreReceta: string;
@@ -6,6 +5,7 @@ export interface Receta {
     porcionesRinde: number;
     costoTotal: number;
     costoPorPorcion: number;
+    porcentajeGanancia: number;
 }
 
 export interface IngredienteReceta {

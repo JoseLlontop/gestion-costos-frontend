@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
     Box,
     Button,
@@ -13,18 +13,18 @@ import {
     Collapse,
     Paper,
     IconButton,
-    Modal
-} from '@mui/material';
-import ModalNuevaReceta from '../../components/recetas/ModalNuevaReceta';
-import ModalAgregarIngredienteXReceta from '../../components/recetas/ModalAgregarIngredienteXReceta';
-import { useApiRequest } from '../../hook/useApiRequest';
-import AddIcon from '@mui/icons-material/Add';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import { show_alerta } from '../../helpers/funcionSweetAlert';
+    Modal,
+} from "@mui/material";
+import ModalNuevaReceta from "../../components/recetas/ModalNuevaReceta";
+import ModalAgregarIngredienteXReceta from "../../components/recetas/ModalAgregarIngredienteXReceta";
+import { useApiRequest } from "../../hook/useApiRequest";
+import AddIcon from "@mui/icons-material/Add";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import { show_alerta } from "../../helpers/funcionSweetAlert";
 
 interface Receta {
     id: number;
@@ -33,6 +33,8 @@ interface Receta {
     porcionesRinde: number;
     costoTotal: number;
     costoPorPorcion: number;
+    porcentajeGanancia: number;
+    precioVenta: number;
 }
 
 interface Ingrediente {
@@ -46,17 +48,23 @@ interface Ingrediente {
 const GestionRecetas = () => {
     const [recetas, setRecetas] = useState<Receta[]>([]);
     const [nombreRecetaBuscada, setNombreRecetaBuscada] = useState("");
-    const [recetasExpandidas, setRecetasExpandidas] = useState<{ [key: number]: boolean }>({});
-    const [ingredientesPorReceta, setIngredientesPorReceta] = useState<{ [key: number]: Ingrediente[] }>({});
+    const [recetasExpandidas, setRecetasExpandidas] = useState<{
+        [key: number]: boolean;
+    }>({});
+    const [ingredientesPorReceta, setIngredientesPorReceta] = useState<{
+        [key: number]: Ingrediente[];
+    }>({});
     const [openModal, setOpenModal] = useState(false);
     const [openModalIngredientes, setOpenModalIngredientes] = useState(false);
-    const [selectedRecetaId, setSelectedRecetaId] = useState<number | null>(null);
+    const [selectedRecetaId, setSelectedRecetaId] = useState<number | null>(
+        null
+    );
 
     const API_URL = "http://localhost:8080";
 
     const { data, isLoading, error } = useApiRequest(
         `${API_URL}/api/recetas`,
-        'GET'
+        "GET"
     );
 
     useEffect(() => {
@@ -65,24 +73,28 @@ const GestionRecetas = () => {
         }
     }, [data, isLoading, error]);
 
-    const recetasFiltradas = recetas.filter(receta =>
-        receta.nombreReceta.toLowerCase().includes(nombreRecetaBuscada.toLowerCase())
+    const recetasFiltradas = recetas.filter((receta) =>
+        receta.nombreReceta
+            .toLowerCase()
+            .includes(nombreRecetaBuscada.toLowerCase())
     );
 
     const toggleReceta = async (id: number) => {
-        setRecetasExpandidas(prevState => ({
+        setRecetasExpandidas((prevState) => ({
             ...prevState,
-            [id]: !prevState[id]
+            [id]: !prevState[id],
         }));
 
         if (!recetasExpandidas[id]) {
             try {
-                const response = await fetch(`${API_URL}/api/IngredientesXReceta/getxRecetaId=${id}`);
+                const response = await fetch(
+                    `${API_URL}/api/IngredientesXReceta/getxRecetaId=${id}`
+                );
                 const ingredientes: Ingrediente[] = await response.json();
-                
-                setIngredientesPorReceta(prevState => ({
+
+                setIngredientesPorReceta((prevState) => ({
                     ...prevState,
-                    [id]: ingredientes
+                    [id]: ingredientes,
                 }));
             } catch (error) {
                 console.error("Error al obtener los ingredientes:", error);
@@ -93,11 +105,13 @@ const GestionRecetas = () => {
     const handleDeleteReceta = async (id: number) => {
         try {
             const response = await fetch(`${API_URL}/api/recetas/${id}`, {
-                method: 'DELETE',
+                method: "DELETE",
             });
 
             if (response.ok) {
-                setRecetas(prevRecetas => prevRecetas.filter(receta => receta.id !== id));
+                setRecetas((prevRecetas) =>
+                    prevRecetas.filter((receta) => receta.id !== id)
+                );
                 show_alerta("Receta eliminada con éxito", "success");
             } else {
                 show_alerta("Error al eliminar la receta", "error");
@@ -108,12 +122,19 @@ const GestionRecetas = () => {
         }
     };
 
-    const handleDeleteIngrediente = (recetaId: number, ingredienteId: number) => {
-        console.log(`Eliminar ingrediente con id: ${ingredienteId} de la receta con id: ${recetaId}`);
+    const handleDeleteIngrediente = (
+        recetaId: number,
+        ingredienteId: number
+    ) => {
+        console.log(
+            `Eliminar ingrediente con id: ${ingredienteId} de la receta con id: ${recetaId}`
+        );
     };
 
     const handleEditIngrediente = (recetaId: number, ingredienteId: number) => {
-        console.log(`Editar ingrediente con id: ${ingredienteId} de la receta con id: ${recetaId}`);
+        console.log(
+            `Editar ingrediente con id: ${ingredienteId} de la receta con id: ${recetaId}`
+        );
     };
 
     const handleOpenModal = () => setOpenModal(true);
@@ -154,22 +175,28 @@ const GestionRecetas = () => {
                 </Button>
             </Box>
 
-            <ModalNuevaReceta open={openModal} handleClose={handleCloseModal} onSave={handleSave} />
+            <ModalNuevaReceta
+                open={openModal}
+                handleClose={handleCloseModal}
+                onSave={handleSave}
+            />
 
             <Modal
                 open={openModalIngredientes}
                 onClose={handleCloseModalIngredientes}
             >
-                <Box sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: 600,
-                    bgcolor: 'background.paper',
-                    boxShadow: 24,
-                    p: 4,
-                }}>
+                <Box
+                    sx={{
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        width: 600,
+                        bgcolor: "background.paper",
+                        boxShadow: 24,
+                        p: 4,
+                    }}
+                >
                     <ModalAgregarIngredienteXReceta
                         open={openModalIngredientes}
                         handleClose={handleCloseModalIngredientes}
@@ -189,83 +216,260 @@ const GestionRecetas = () => {
 
             <TableContainer component={Paper} sx={{ boxShadow: 3 }}>
                 <Table stickyHeader>
-                    <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
+                    <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
                         <TableRow>
                             <TableCell></TableCell>
-                            <TableCell><strong>Receta</strong></TableCell>
-                            <TableCell><strong>Descripción</strong></TableCell>
-                            <TableCell align="center"><strong>Porciones</strong></TableCell>
-                            <TableCell align="center"><strong>Costo Total</strong></TableCell>
-                            <TableCell align="center"><strong>Costo por Porción</strong></TableCell>
-                            <TableCell><strong>Acciones</strong></TableCell>
+                            <TableCell align="center">
+                                <strong>Receta</strong>
+                            </TableCell>
+                            <TableCell align="center">
+                                <strong>Descripción</strong>
+                            </TableCell>
+                            <TableCell align="center">
+                                <strong>Porciones</strong>
+                            </TableCell>
+                            <TableCell align="center">
+                                <strong>Costo Total</strong>
+                            </TableCell>
+                            <TableCell align="center">
+                                <strong>Costo por Porción</strong>
+                            </TableCell>
+                            <TableCell align="center">
+                                <strong>Porcentaje de Ganancia</strong>
+                            </TableCell>
+                            <TableCell align="center">
+                                <strong>Precio de Venta</strong>
+                            </TableCell>
+                            <TableCell align="center">
+                                <strong>Acciones</strong>
+                            </TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {recetasFiltradas.length > 0 ? (
                             recetasFiltradas.map((receta) => (
                                 <React.Fragment key={receta.id}>
-                                    <TableRow onClick={() => toggleReceta(receta.id)} style={{ cursor: 'pointer', backgroundColor: recetasExpandidas[receta.id] ? '#e0f7fa' : 'white' }}>
+                                    <TableRow
+                                        onClick={() => toggleReceta(receta.id)}
+                                        style={{
+                                            cursor: "pointer",
+                                            backgroundColor: recetasExpandidas[
+                                                receta.id
+                                            ]
+                                                ? "#e0f7fa"
+                                                : "white",
+                                        }}
+                                    >
                                         <TableCell>
-                                            {recetasExpandidas[receta.id] ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                                            {recetasExpandidas[receta.id] ? (
+                                                <ExpandLessIcon />
+                                            ) : (
+                                                <ExpandMoreIcon />
+                                            )}
                                         </TableCell>
-                                        <TableCell>{receta.nombreReceta}</TableCell>
-                                        <TableCell>{receta.descripcion}</TableCell>
-                                        <TableCell align="center">{receta.porcionesRinde}</TableCell>
-                                        <TableCell align="center" style={{ color: 'green' }}>
-                                            <strong>${receta.costoTotal.toFixed(2)}</strong>
+                                        <TableCell align="center">
+                                            {receta.nombreReceta}
                                         </TableCell>
-                                        <TableCell align="center" style={{ color: 'blue' }}>
-                                            <strong>${receta.costoPorPorcion.toFixed(2)}</strong>
+                                        <TableCell align="center">
+                                            {receta.descripcion}
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            {receta.porcionesRinde}
+                                        </TableCell>
+                                        <TableCell
+                                            align="center"
+                                            style={{ color: "green" }}
+                                        >
+                                            <strong>
+                                                ${receta.costoTotal.toFixed(2)}
+                                            </strong>
+                                        </TableCell>
+                                        <TableCell
+                                            align="center"
+                                            style={{ color: "blue" }}
+                                        >
+                                            <strong>
+                                                $
+                                                {receta.costoPorPorcion.toFixed(
+                                                    2
+                                                )}
+                                            </strong>
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <strong>
+                                                {receta.porcentajeGanancia}
+                                            </strong>
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <strong>
+                                                ${receta.precioVenta.toFixed(2)}
+                                            </strong>
                                         </TableCell>
                                         <TableCell>
-                                            <IconButton color="error" onClick={() => handleDeleteReceta(receta.id)}>
+                                            <IconButton
+                                                color="error"
+                                                onClick={() =>
+                                                    handleDeleteReceta(
+                                                        receta.id
+                                                    )
+                                                }
+                                            >
                                                 <DeleteIcon />
                                             </IconButton>
-                                            <IconButton color="primary" onClick={() => console.log(`Editar receta con id: ${receta.id}`)}>
+                                            <IconButton
+                                                color="primary"
+                                                onClick={() =>
+                                                    console.log(
+                                                        `Editar receta con id: ${receta.id}`
+                                                    )
+                                                }
+                                            >
                                                 <EditIcon />
                                             </IconButton>
-                                            <IconButton color="secondary" onClick={() => handleOpenModalIngredientes(receta.id)}>
+                                            <IconButton
+                                                color="secondary"
+                                                onClick={() =>
+                                                    handleOpenModalIngredientes(
+                                                        receta.id
+                                                    )
+                                                }
+                                            >
                                                 <AddCircleIcon />
                                             </IconButton>
                                         </TableCell>
                                     </TableRow>
                                     <TableRow>
-                                        <TableCell colSpan={7} style={{ padding: 0 }}>
-                                            <Collapse in={recetasExpandidas[receta.id]} timeout="auto" unmountOnExit>
+                                        <TableCell
+                                            colSpan={7}
+                                            style={{ padding: 0 }}
+                                        >
+                                            <Collapse
+                                                in={
+                                                    recetasExpandidas[receta.id]
+                                                }
+                                                timeout="auto"
+                                                unmountOnExit
+                                            >
                                                 <Box margin={1}>
-                                                    <Typography variant="h6">Ingredientes:</Typography>
+                                                    <Typography variant="h6">
+                                                        Ingredientes:
+                                                    </Typography>
                                                     <Table>
                                                         <TableHead>
                                                             <TableRow>
-                                                                <TableCell><strong>Nombre</strong></TableCell>
-                                                                <TableCell align="center"><strong>Cantidad Utilizada en Receta</strong></TableCell>
-                                                                <TableCell align="center"><strong>Costo</strong></TableCell>
-                                                                <TableCell align="center"><strong>Marca</strong></TableCell>
-                                                                <TableCell align="center"><strong>Acciones</strong></TableCell>
+                                                                <TableCell>
+                                                                    <strong>
+                                                                        Nombre
+                                                                    </strong>
+                                                                </TableCell>
+                                                                <TableCell align="center">
+                                                                    <strong>
+                                                                        Cantidad
+                                                                        Utilizada
+                                                                        en
+                                                                        Receta
+                                                                    </strong>
+                                                                </TableCell>
+                                                                <TableCell align="center">
+                                                                    <strong>
+                                                                        Costo
+                                                                    </strong>
+                                                                </TableCell>
+                                                                <TableCell align="center">
+                                                                    <strong>
+                                                                        Marca
+                                                                    </strong>
+                                                                </TableCell>
+                                                                <TableCell align="center">
+                                                                    <strong>
+                                                                        Acciones
+                                                                    </strong>
+                                                                </TableCell>
                                                             </TableRow>
                                                         </TableHead>
                                                         <TableBody>
-                                                            {ingredientesPorReceta[receta.id] && ingredientesPorReceta[receta.id].length > 0 ? (
-                                                                ingredientesPorReceta[receta.id].map((ingrediente) => (
-                                                                    <TableRow key={ingrediente.id}>
-                                                                        <TableCell>{ingrediente.nombre}</TableCell>
-                                                                        <TableCell align="center">{ingrediente.cantidad} gr</TableCell>
-                                                                        <TableCell align="center">${ingrediente.costo.toFixed(2)}</TableCell>
-                                                                        <TableCell align="center">{ingrediente.marca}</TableCell>
-                                                                        <TableCell align="center">
-                                                                            <IconButton color="primary" onClick={() => handleEditIngrediente(receta.id, ingrediente.id)}>
-                                                                                <EditIcon />
-                                                                            </IconButton>
-                                                                            <IconButton color="error" onClick={() => handleDeleteIngrediente(receta.id, ingrediente.id)}>
-                                                                                <DeleteIcon />
-                                                                            </IconButton>
-                                                                        </TableCell>
-                                                                    </TableRow>
-                                                                ))
+                                                            {ingredientesPorReceta[
+                                                                receta.id
+                                                            ] &&
+                                                            ingredientesPorReceta[
+                                                                receta.id
+                                                            ].length > 0 ? (
+                                                                ingredientesPorReceta[
+                                                                    receta.id
+                                                                ].map(
+                                                                    (
+                                                                        ingrediente
+                                                                    ) => (
+                                                                        <TableRow
+                                                                            key={
+                                                                                ingrediente.id
+                                                                            }
+                                                                        >
+                                                                            <TableCell>
+                                                                                {
+                                                                                    ingrediente.nombre
+                                                                                }
+                                                                            </TableCell>
+                                                                            <TableCell align="center">
+                                                                                {
+                                                                                    ingrediente.cantidad
+                                                                                }{" "}
+                                                                                gr
+                                                                            </TableCell>
+                                                                            <TableCell align="center">
+                                                                                $
+                                                                                {ingrediente.costo.toFixed(
+                                                                                    2
+                                                                                )}
+                                                                            </TableCell>
+                                                                            <TableCell align="center">
+                                                                                {
+                                                                                    ingrediente.marca
+                                                                                }
+                                                                            </TableCell>
+                                                                            <TableCell align="center">
+                                                                                <IconButton
+                                                                                    color="primary"
+                                                                                    onClick={() =>
+                                                                                        handleEditIngrediente(
+                                                                                            receta.id,
+                                                                                            ingrediente.id
+                                                                                        )
+                                                                                    }
+                                                                                >
+                                                                                    <EditIcon />
+                                                                                </IconButton>
+                                                                                <IconButton
+                                                                                    color="error"
+                                                                                    onClick={() =>
+                                                                                        handleDeleteIngrediente(
+                                                                                            receta.id,
+                                                                                            ingrediente.id
+                                                                                        )
+                                                                                    }
+                                                                                >
+                                                                                    <DeleteIcon />
+                                                                                </IconButton>
+                                                                            </TableCell>
+                                                                        </TableRow>
+                                                                    )
+                                                                )
                                                             ) : (
                                                                 <TableRow>
-                                                                    <TableCell colSpan={5} align="center">
-                                                                        <Typography>No hay ingredientes para esta receta.</Typography>
+                                                                    <TableCell
+                                                                        colSpan={
+                                                                            5
+                                                                        }
+                                                                        align="center"
+                                                                    >
+                                                                        <Typography>
+                                                                            No
+                                                                            hay
+                                                                            ingredientes
+                                                                            para
+                                                                            esta
+                                                                            receta.
+                                                                        </Typography>
                                                                     </TableCell>
                                                                 </TableRow>
                                                             )}
@@ -280,7 +484,9 @@ const GestionRecetas = () => {
                         ) : (
                             <TableRow>
                                 <TableCell colSpan={7} align="center">
-                                    <Typography>No se encontraron recetas.</Typography>
+                                    <Typography>
+                                        No se encontraron recetas.
+                                    </Typography>
                                 </TableCell>
                             </TableRow>
                         )}
