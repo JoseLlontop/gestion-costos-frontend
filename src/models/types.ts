@@ -14,3 +14,10 @@ export interface IngredienteReceta {
     nombre: string;
     marca: string;
 }
+
+export interface Costo {
+    id: number;
+    nombre: string;
+    tipo: string;
+    valor: number;
+}
