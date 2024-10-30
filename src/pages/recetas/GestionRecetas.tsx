@@ -16,6 +16,7 @@ import {
     Modal,
 } from "@mui/material";
 import ModalNuevaReceta from "../../components/recetas/ModalNuevaReceta";
+import ModalModificarCantidad from "../../components/recetas/ModalModificarCantidad";
 import ModalAgregarIngredienteXReceta from "../../components/recetas/ModalAgregarIngredienteXReceta";
 import { useApiRequest } from "../../hook/useApiRequest";
 import AddIcon from "@mui/icons-material/Add";
@@ -56,7 +57,11 @@ const GestionRecetas = () => {
     }>({});
     const [openModal, setOpenModal] = useState(false);
     const [openModalIngredientes, setOpenModalIngredientes] = useState(false);
+    const [openModalModificarCantidad, setOpenModalModificarCantidad] = useState(false);
     const [selectedRecetaId, setSelectedRecetaId] = useState<number | null>(
+        null
+    );
+    const [selectedIngredienteId, setSelectedIngredienteId] = useState<number | null>(
         null
     );
 
@@ -146,14 +151,37 @@ const GestionRecetas = () => {
         }
       };
 
-    const handleEditIngrediente = (recetaId: number, ingredienteId: number) => {
-        console.log(
-            `Editar ingrediente con id: ${ingredienteId} de la receta con id: ${recetaId}`
-        );
-    };
 
     const handleOpenModal = () => setOpenModal(true);
     const handleCloseModal = () => setOpenModal(false);
+
+    const handleOpenModalModificarIngrediente = (recetaId: number, ingredienteId: number) => {
+        setSelectedRecetaId(recetaId);
+        setSelectedIngredienteId(ingredienteId);
+        setOpenModalModificarCantidad(true);
+    }
+    const handleCloseModalModificarIngrediente = () => {
+        setOpenModalModificarCantidad(false);
+        if (selectedRecetaId !== null) {
+            const fetchIngredientes = async () => {
+                try {
+                    const response = await fetch(
+                        `${API_URL}/api/IngredientesXReceta/getxRecetaId=${selectedRecetaId}`
+                    );
+                    const ingredientes: Ingrediente[] = await response.json();
+
+                    setIngredientesPorReceta((prevState) => ({
+                        ...prevState,
+                        [selectedRecetaId]: ingredientes,
+                    }));
+                } catch (error) {
+                    console.error("Error al obtener los ingredientes:", error);
+                }
+            };
+
+            fetchIngredientes(); // Llamada a la función para actualizar los ingredientes
+        }
+    };
 
     const handleOpenModalIngredientes = (recetaId: number) => {
         setSelectedRecetaId(recetaId);
@@ -175,6 +203,7 @@ const GestionRecetas = () => {
 
         fetchRecetas(); // Llamada a la función para actualizar el estado
         handleCloseModal(); // Cerrar el modal después de guardar
+
     };
 
     return (
@@ -217,8 +246,18 @@ const GestionRecetas = () => {
                         handleClose={handleCloseModalIngredientes}
                         recetaId={selectedRecetaId}
                     />
+
+                   
                 </Box>
             </Modal>
+
+            
+            <ModalModificarCantidad
+                open={openModalModificarCantidad}
+                handleClose={handleCloseModalModificarIngrediente}
+                recetaId={selectedRecetaId}
+                ingredienteId={selectedIngredienteId}
+            />
 
             <TextField
                 fullWidth
@@ -446,7 +485,7 @@ const GestionRecetas = () => {
                                                                                 <IconButton
                                                                                     color="primary"
                                                                                     onClick={() =>
-                                                                                        handleEditIngrediente(
+                                                                                        handleOpenModalModificarIngrediente(
                                                                                             receta.id,
                                                                                             ingrediente.id
                                                                                         )
