@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Receta, IngredienteReceta, Costo } from "../../models/types";
 import { useApiRequest } from "../../hook/useApiRequest";
+import AplicarCambiosButton from "./AplicarCambiosButton";
 import {
     Box,
     Grid,
@@ -48,6 +49,8 @@ const GestionGanancia: React.FC = () => {
         isLoading: costosLoading,
         error: costosError,
     } = useApiRequest<Costo[]>("http://localhost:8080/api/costos/");
+
+    // handle click para los botones de aplicar cambios
 
     const calcularPrecioVenta = () => {
         if (selectedReceta /*&& costosFijos */) {
@@ -217,7 +220,7 @@ const GestionGanancia: React.FC = () => {
                     </Grid>
 
                     {/* Mostrar detalles de los costos fijos */}
-                    <Grid item xs={12}>
+                    {/* <Grid item xs={12}>
                         <Card>
                             <CardContent>
                                 <Typography variant="h6">
@@ -263,7 +266,7 @@ const GestionGanancia: React.FC = () => {
                                 </Grid>
                             </CardContent>
                         </Card>
-                    </Grid>
+                    </Grid> */}
 
                     <Grid item xs={12}>
                         <Card>
@@ -321,12 +324,10 @@ const GestionGanancia: React.FC = () => {
                                             >
                                                 Calcular
                                             </Button>
-                                            <Button
-                                                variant="contained"
-                                                color="success"
-                                            >
-                                                Aplicar Cambios
-                                            </Button>
+                                            <AplicarCambiosButton
+                                                recetaId={selectedReceta.id}
+                                                porcentajeGanancia={margen}
+                                            />
                                         </Box>
                                     </Box>
                                     <Divider
@@ -385,12 +386,12 @@ const GestionGanancia: React.FC = () => {
                                             >
                                                 Calcular
                                             </Button>
-                                            <Button
-                                                variant="contained"
-                                                color="success"
-                                            >
-                                                Aplicar Cambios
-                                            </Button>
+                                            <AplicarCambiosButton
+                                                recetaId={selectedReceta.id}
+                                                porcentajeGanancia={
+                                                    porcentajeGanancia
+                                                }
+                                            />
                                         </Box>
                                     </Box>
                                     <Divider
