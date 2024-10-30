@@ -64,6 +64,7 @@ const GestionRecetas = () => {
     const [selectedIngredienteId, setSelectedIngredienteId] = useState<number | null>(
         null
     );
+    const [recetaToEdit, setRecetaToEdit] = useState<Receta | null>(null);
 
     const API_URL = "http://localhost:8080";
 
@@ -107,6 +108,43 @@ const GestionRecetas = () => {
         }
     };
 
+    const handleOpenEditModal = (receta: Receta) => {
+        setRecetaToEdit(receta);
+        setOpenModal(true);
+    };
+
+    const handleCloseEditModal = () => {
+        setOpenModal(false);
+        setRecetaToEdit(null);
+    };
+
+    const handleUpdateReceta = async (id: number, updatedReceta: Receta) => {
+        try {
+            const response = await fetch(`${API_URL}/api/recetas/${id}`, {
+                method: "PUT",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedReceta),
+            });
+
+            if (response.ok) {
+                setRecetas((prevRecetas) =>
+                    prevRecetas.map((receta) =>
+                        receta.id === id ? updatedReceta : receta
+                    )
+                );
+                show_alerta("Receta modificada con éxito", "success");
+                handleCloseEditModal();
+            } else {
+                show_alerta("Error al modificar la receta", "error");
+            }
+        } catch (error) {
+            console.error("Error al modificar la receta:", error);
+            show_alerta("Ocurrió un error inesperado.", "error");
+        }
+    };
+
     const handleDeleteReceta = async (id: number) => {
         try {
             const response = await fetch(`${API_URL}/api/recetas/${id}`, {
@@ -127,30 +165,28 @@ const GestionRecetas = () => {
         }
     };
 
-    
-    const handleDeleteIngrediente = async (recetaId: number, ingredienteId: number ) => {
+    const handleDeleteIngrediente = async (recetaId: number, ingredienteId: number) => {
         try {
-          const response = await fetch(`${API_URL}/api/IngredientesXReceta/${recetaId}/${ingredienteId}`, {
-            method: 'DELETE',
-          });
-    
-          if (response.ok) {
-            setIngredientesPorReceta((prevState) => ({
-                ...prevState,
-                [recetaId]: prevState[recetaId].filter(
-                    (ingrediente) => ingrediente.id !== ingredienteId
-                ),
-            }));
-            show_alerta("Ingrediente eliminado con éxito", "success");
-          } else {
-            show_alerta("Error al eliminar el ingrediente", "error");
-          }
-        } catch (error) {
-          console.error("Error al eliminar el ingrediente:", error);
-          show_alerta("Ocurrió un error inesperado.", "error");
-        }
-      };
+            const response = await fetch(`${API_URL}/api/IngredientesXReceta/${recetaId}/${ingredienteId}`, {
+                method: 'DELETE',
+            });
 
+            if (response.ok) {
+                setIngredientesPorReceta((prevState) => ({
+                    ...prevState,
+                    [recetaId]: prevState[recetaId].filter(
+                        (ingrediente) => ingrediente.id !== ingredienteId
+                    ),
+                }));
+                show_alerta("Ingrediente eliminado con éxito", "success");
+            } else {
+                show_alerta("Error al eliminar el ingrediente", "error");
+            }
+        } catch (error) {
+            console.error("Error al eliminar el ingrediente:", error);
+            show_alerta("Ocurrió un error inesperado.", "error");
+        }
+    };
 
     const handleOpenModal = () => setOpenModal(true);
     const handleCloseModal = () => setOpenModal(false);
@@ -179,7 +215,7 @@ const GestionRecetas = () => {
                 }
             };
 
-            fetchIngredientes(); // Llamada a la función para actualizar los ingredientes
+            fetchIngredientes();
         }
     };
 
@@ -190,7 +226,6 @@ const GestionRecetas = () => {
     const handleCloseModalIngredientes = () => setOpenModalIngredientes(false);
 
     const handleSave = () => {
-        // Aquí puedes volver a hacer la llamada a la API para obtener las recetas actualizadas si es necesario
         const fetchRecetas = async () => {
             try {
                 const response = await fetch(`${API_URL}/api/recetas`);
@@ -201,9 +236,8 @@ const GestionRecetas = () => {
             }
         };
 
-        fetchRecetas(); // Llamada a la función para actualizar el estado
-        handleCloseModal(); // Cerrar el modal después de guardar
-
+        fetchRecetas(); 
+        handleCloseModal(); 
     };
 
     return (
@@ -222,6 +256,7 @@ const GestionRecetas = () => {
             <ModalNuevaReceta
                 open={openModal}
                 handleClose={handleCloseModal}
+                receta={recetaToEdit}
                 onSave={handleSave}
             />
 
@@ -246,12 +281,9 @@ const GestionRecetas = () => {
                         handleClose={handleCloseModalIngredientes}
                         recetaId={selectedRecetaId}
                     />
-
-                   
                 </Box>
             </Modal>
 
-            
             <ModalModificarCantidad
                 open={openModalModificarCantidad}
                 handleClose={handleCloseModalModificarIngrediente}
@@ -373,9 +405,7 @@ const GestionRecetas = () => {
                                             <IconButton
                                                 color="primary"
                                                 onClick={() =>
-                                                    console.log(
-                                                        `Editar receta con id: ${receta.id}`
-                                                    )
+                                                    handleOpenEditModal(receta)
                                                 }
                                             >
                                                 <EditIcon />
@@ -394,7 +424,7 @@ const GestionRecetas = () => {
                                     </TableRow>
                                     <TableRow>
                                         <TableCell
-                                            colSpan={7}
+                                            colSpan={9}
                                             style={{ padding: 0 }}
                                         >
                                             <Collapse
@@ -537,7 +567,7 @@ const GestionRecetas = () => {
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={7} align="center">
+                                <TableCell colSpan={9} align="center">
                                     <Typography>
                                         No se encontraron recetas.
                                     </Typography>

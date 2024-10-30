@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     Box,
     Button,
@@ -21,7 +21,7 @@ import { show_alerta } from "../../helpers/funcionSweetAlert";
 import ModalAgregarIngredienteXReceta from "./ModalAgregarIngredienteXReceta";
 import PercentIcon from "@mui/icons-material/Percent";
 
-const ModalNuevaReceta = ({ open, handleClose, ...props }) => {
+const ModalNuevaReceta = ({ open, handleClose, receta, onSave }) => {
     const [nombre, setNombre] = useState("");
     const [descripcion, setDescripcion] = useState("");
     const [porcionesRinde, setPorcionesRinde] = useState("");
@@ -31,6 +31,16 @@ const ModalNuevaReceta = ({ open, handleClose, ...props }) => {
     const [porcentajeGanancia, setPorcentajeGanancia] = useState("");
 
     const API_URL = "http://localhost:8080";
+
+    useEffect(() => {
+        if (receta) {
+            setNombre(receta.nombreReceta || "");
+            setDescripcion(receta.descripcion || "");
+            setPorcionesRinde(receta.porcionesRinde ? receta.porcionesRinde.toString() : "");
+            setPorcentajeGanancia(receta.porcentajeGanancia || "");
+            setRecetaId(receta.id || null);
+        }
+    }, [receta]);
 
     //Función para manejar el envío del formulario
     const handleSubmit = async (e) => {
@@ -45,9 +55,8 @@ const ModalNuevaReceta = ({ open, handleClose, ...props }) => {
         };
 
         try {
-            // Realizar la solicitud POST al backend
-            const response = await fetch(`${API_URL}/api/recetas/crear`, {
-                method: "POST",
+            const response = await fetch(`${API_URL}/api/recetas/${recetaId ? `${recetaId}` : 'crear'}`, {
+                method: recetaId ? "PUT" : "POST",
                 headers: {
                     "Content-Type": "application/json", // indicar que se envia un json
                 },
@@ -57,8 +66,15 @@ const ModalNuevaReceta = ({ open, handleClose, ...props }) => {
             if (response.ok) {
                 const data = await response.json();
                 setRecetaId(data.id);
-                setMensaje("Receta creada con éxito");
-                show_alerta("Receta creada con éxito", "success"); // Mostrar alerta de éxito
+                if (recetaId) {
+                    setMensaje("Receta modificada con éxito");
+                    show_alerta("Receta modificada con éxito", "success"); // Mostrar alerta de éxito
+                } else {
+                    setMensaje("Receta creada con éxito");
+                    show_alerta("Receta creada con éxito", "success"); // Mostrar alerta de éxito
+                    // Abrir el modal para agregar ingredientes
+                    setModalIngredientesOpen(true);
+                }
                 // Limpiar los campos después de crear la receta
                 setNombre("");
                 setDescripcion("");
@@ -66,11 +82,9 @@ const ModalNuevaReceta = ({ open, handleClose, ...props }) => {
                 setPorcentajeGanancia("");
                 // Cerrar el modal después de guardar
                 handleClose();
-                // Abrir el modal para agregar ingredientes
-                setModalIngredientesOpen(true);
                 // Llamar a la función onSave si está definida
-                if (props.onSave) {
-                    props.onSave();
+                if (onSave) {
+                    onSave();
                 }
             } else {
                 setMensaje("Error al crear la receta");
@@ -104,7 +118,7 @@ const ModalNuevaReceta = ({ open, handleClose, ...props }) => {
                         alignItems="center"
                     >
                         <Typography variant="h6" component="h2">
-                            Añadir Nueva Receta
+                            {recetaId ? "Editar Receta" : "Añadir Nueva Receta"}
                         </Typography>
                         <IconButton onClick={handleClose}>
                             <CloseIcon />
