@@ -5,6 +5,10 @@ import {
     DialogContent,
     DialogActions,
     TextField,
+    RadioGroup,
+    FormLabel,
+    Radio,
+    FormControlLabel,
     Button,
     Alert,
     InputAdornment,
@@ -90,21 +94,6 @@ const ModalNuevoCosto = ({ open, onClose, onSave, costo }) => {
 
                 <TextField
                     margin="dense"
-                    label="Tipo"
-                    fullWidth
-                    value={tipo}
-                    onChange={(e) => setTipo(e.target.value)}
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <FontAwesomeIcon icon={faComment} />
-                            </InputAdornment>
-                        ),
-                    }}
-                />
-
-                <TextField
-                    margin="dense"
                     label="Valor"
                     fullWidth
                     value={valor}
@@ -117,6 +106,16 @@ const ModalNuevoCosto = ({ open, onClose, onSave, costo }) => {
                         ),
                     }}
                 />
+
+                <FormLabel component="legend" sx={{ marginTop: 2 }}>Tipo de Costo</FormLabel>
+                <RadioGroup
+                    value={tipo}
+                    onChange={(e) => setTipo(e.target.value)}
+                    row
+                >
+                    <FormControlLabel value="Fijo" control={<Radio />} label="Fijo" />
+                    <FormControlLabel value="Variable" control={<Radio />} label="Variable" />
+                </RadioGroup>
 
             </DialogContent>
             <DialogActions>
