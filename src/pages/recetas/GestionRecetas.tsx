@@ -122,14 +122,29 @@ const GestionRecetas = () => {
         }
     };
 
-    const handleDeleteIngrediente = (
-        recetaId: number,
-        ingredienteId: number
-    ) => {
-        console.log(
-            `Eliminar ingrediente con id: ${ingredienteId} de la receta con id: ${recetaId}`
-        );
-    };
+    
+    const handleDeleteIngrediente = async (recetaId: number, ingredienteId: number ) => {
+        try {
+          const response = await fetch(`${API_URL}/api/IngredientesXReceta/${recetaId}/${ingredienteId}`, {
+            method: 'DELETE',
+          });
+    
+          if (response.ok) {
+            setIngredientesPorReceta((prevState) => ({
+                ...prevState,
+                [recetaId]: prevState[recetaId].filter(
+                    (ingrediente) => ingrediente.id !== ingredienteId
+                ),
+            }));
+            show_alerta("Ingrediente eliminado con éxito", "success");
+          } else {
+            show_alerta("Error al eliminar el ingrediente", "error");
+          }
+        } catch (error) {
+          console.error("Error al eliminar el ingrediente:", error);
+          show_alerta("Ocurrió un error inesperado.", "error");
+        }
+      };
 
     const handleEditIngrediente = (recetaId: number, ingredienteId: number) => {
         console.log(
