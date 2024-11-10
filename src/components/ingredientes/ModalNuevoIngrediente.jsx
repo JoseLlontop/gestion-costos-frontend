@@ -11,7 +11,9 @@ import {
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faComment, faDollar } from "@fortawesome/free-solid-svg-icons";
-import { show_alerta } from '../../helpers/funcionSweetAlert'; // Importa show_alerta
+import { show_alerta } from "../../helpers/funcionSweetAlert"; // Importa show_alerta
+import MarcaSelect from "./SelectMarca";
+import ModalNuevaMarca from "./ModalNuevaMarca";
 
 const ModalNuevoIngrediente = ({ open, onClose, onSave, ingrediente }) => {
     const [nombre, setNombre] = useState("");
@@ -20,6 +22,7 @@ const ModalNuevoIngrediente = ({ open, onClose, onSave, ingrediente }) => {
     const [unidad_medida, setUnidadMedida] = useState("");
     const [cantidad_paquete, setCantidadPaquete] = useState("");
     const [error, setError] = useState("");
+    const [openModalMarca, setOpenModalMarca] = useState(false);
 
     useEffect(() => {
         // Si hay un ingrediente, cargar sus datos en el formulario
@@ -43,7 +46,13 @@ const ModalNuevoIngrediente = ({ open, onClose, onSave, ingrediente }) => {
         const parsedPrecio = parseFloat(precio);
         const parsedCantidadPaquete = parseInt(cantidad_paquete);
 
-        if (!nombre || !marca || !precio || !unidad_medida || !cantidad_paquete) {
+        if (
+            !nombre ||
+            !marca ||
+            !precio ||
+            !unidad_medida ||
+            !cantidad_paquete
+        ) {
             setError("Todos los campos son obligatorios.");
             show_alerta("Todos los campos son obligatorios.", "warning");
             return;
@@ -56,13 +65,18 @@ const ModalNuevoIngrediente = ({ open, onClose, onSave, ingrediente }) => {
         }
 
         if (isNaN(parsedCantidadPaquete) || parsedCantidadPaquete <= 0) {
-            setError("La cantidad del paquete debe ser un número entero positivo.");
-            show_alerta("La cantidad del paquete debe ser un número entero positivo.", "warning");
+            setError(
+                "La cantidad del paquete debe ser un número entero positivo."
+            );
+            show_alerta(
+                "La cantidad del paquete debe ser un número entero positivo.",
+                "warning"
+            );
             return;
         }
 
         setError("");
-        
+
         // Llamar a onSave con los datos del ingrediente
         onSave({
             id: ingrediente?.id || null, // Incluye el ID solo si es edición
@@ -74,7 +88,12 @@ const ModalNuevoIngrediente = ({ open, onClose, onSave, ingrediente }) => {
         });
 
         // Mostrar alerta de éxito después de guardar o actualizar
-        show_alerta(ingrediente ? "Ingrediente actualizado con éxito" : "Ingrediente guardado con éxito", "success");
+        show_alerta(
+            ingrediente
+                ? "Ingrediente actualizado con éxito"
+                : "Ingrediente guardado con éxito",
+            "success"
+        );
 
         // Limpiar campos del formulario
         setNombre("");
@@ -84,9 +103,27 @@ const ModalNuevoIngrediente = ({ open, onClose, onSave, ingrediente }) => {
         setCantidadPaquete("");
     };
 
+    // Función para abrir el modal
+    const handleClickGestionMarca = () => {
+        setOpenModalMarca(true);
+    };
+
+    // Función para cerrar el modal
+    const handleCloseModalMarca = () => {
+        setOpenModalMarca(false);
+    };
+
+    // Función para guardar la nueva marca
+    const handleSaveMarca = (newMarca) => {
+        console.log("Nueva marca guardada:", newMarca);
+        setOpenModalMarca(false); // Cierra el modal después de guardar
+    };
+
     return (
         <Dialog open={open} onClose={onClose}>
-            <DialogTitle>{ingrediente ? "Editar Ingrediente" : "Nuevo Ingrediente"}</DialogTitle>
+            <DialogTitle>
+                {ingrediente ? "Editar Ingrediente" : "Nuevo Ingrediente"}
+            </DialogTitle>
             <DialogContent>
                 {error && <Alert severity="error">{error}</Alert>}
 
@@ -105,20 +142,7 @@ const ModalNuevoIngrediente = ({ open, onClose, onSave, ingrediente }) => {
                     }}
                 />
 
-                <TextField
-                    margin="dense"
-                    label="Marca"
-                    fullWidth
-                    value={marca}
-                    onChange={(e) => setMarca(e.target.value)}
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <FontAwesomeIcon icon={faComment} />
-                            </InputAdornment>
-                        ),
-                    }}
-                />
+                <MarcaSelect setMarca={setMarca} />
 
                 <TextField
                     margin="dense"
@@ -166,11 +190,28 @@ const ModalNuevoIngrediente = ({ open, onClose, onSave, ingrediente }) => {
                 />
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleSave} color="primary" variant="contained">
-                    {ingrediente ? "Actualizar" : "Guardar"}
-                </Button>
                 <Button onClick={onClose} color="secondary" variant="contained">
                     Cerrar
+                </Button>
+                <Button
+                    onClick={handleClickGestionMarca}
+                    color="success"
+                    variant="contained"
+                >
+                    Gestion de marcas
+                </Button>
+                <ModalNuevaMarca
+                    open={openModalMarca} // Cambié esto de 'handleClickGestionMarca' a 'openModalMarca'
+                    onClose={handleCloseModalMarca}
+                    onSave={handleSaveMarca}
+                />
+
+                <Button
+                    onClick={handleSave}
+                    color="primary"
+                    variant="contained"
+                >
+                    {ingrediente ? "Actualizar" : "Guardar"}
                 </Button>
             </DialogActions>
         </Dialog>
