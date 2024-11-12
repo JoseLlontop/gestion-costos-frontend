@@ -108,7 +108,11 @@ const GestionCostosAdicionales = () => {
   };
 
   return (
-    <Box sx={{ padding: 3 }}>
+    <Box sx={{ padding: 1 }}>
+    <h1>Gestión de Costos Adicionales</h1>
+    <Typography variant="body1" align="left" sx={{ mb: 2 }}>
+    En esta pestaña se agregan los costos adicionales del negocio, que pueden ser de tipo fijos o variables.
+    </Typography>
       <Box display="flex" justifyContent="center" sx={{ mb: 2 }}>
         <Button
           variant="contained"

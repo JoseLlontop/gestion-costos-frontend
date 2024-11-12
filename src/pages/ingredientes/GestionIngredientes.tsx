@@ -110,7 +110,11 @@ const GestionIngredientes = () => {
   };
 
   return (
-    <Box sx={{ padding: 3 }}>
+    <Box sx={{ padding: 1 }}>
+      <h1>Gestión de Ingredientes</h1>
+      <Typography variant="body1" align="left" sx={{ mb: 2 }}>
+        En esta pestaña vas a poder agregar los ingredientes que uses, estos servirán para crear las recetas del negocio.
+      </Typography>
       <Box display="flex" justifyContent="center" sx={{ mb: 2 }}>
         <Button
           variant="contained"

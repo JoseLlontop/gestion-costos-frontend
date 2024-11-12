@@ -241,7 +241,11 @@ const GestionRecetas = () => {
     };
 
     return (
-        <Box sx={{ padding: 3 }}>
+        <Box sx={{ padding: 1 }}>
+            <h1>Gestión de Recetas</h1>
+            <Typography variant="body1" align="left" sx={{ mb: 2 }}>
+            En esta pestaña vas a poder agregar las recetas de tu negocio, las mismas se componen de ingredientes.
+            </Typography>
             <Box display="flex" justifyContent="center" sx={{ mb: 2 }}>
                 <Button
                     variant="contained"
