@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import Tooltip from "@mui/material/Tooltip";
 import {
     Box,
     Button,
@@ -172,6 +174,13 @@ const ModalNuevaReceta = ({ open, handleClose, receta, onSave }) => {
                                         <FontAwesomeIcon icon={faListOl} />
                                     </InputAdornment>
                                 ),
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <Tooltip title="Especifique el número de unidades que rinde la receta.">
+                                            <HelpOutlineIcon color="action" />
+                                        </Tooltip>
+                                    </InputAdornment>
+                                ),
                             }}
                         />
                         <TextField
@@ -187,6 +196,13 @@ const ModalNuevaReceta = ({ open, handleClose, receta, onSave }) => {
                                 startAdornment: (
                                     <InputAdornment position="start">
                                         <FontAwesomeIcon icon={faPercent} />
+                                    </InputAdornment>
+                                ),
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <Tooltip title="Especifique el margen de ganancia inicial para esta receta.">
+                                            <HelpOutlineIcon color="action" />
+                                        </Tooltip>
                                     </InputAdornment>
                                 ),
                             }}
