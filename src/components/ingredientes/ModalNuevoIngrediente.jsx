@@ -23,8 +23,22 @@ const ModalNuevoIngrediente = ({ open, onClose, onSave, ingrediente }) => {
     const [cantidad_paquete, setCantidadPaquete] = useState("");
     const [error, setError] = useState("");
     const [openModalMarca, setOpenModalMarca] = useState(false);
+    const [categorias, setCategorias] = useState([]); // Para almacenar las categorías
+    const [loading, setLoading] = useState(true); // Para manejar la carga
 
     useEffect(() => {
+        // Cargar las categorías desde la API
+        fetch("http://localhost:8080/api/unidades/categorias")
+            .then((response) => response.json())
+            .then((data) => {
+                setCategorias(data);
+                setLoading(false);
+            })
+            .catch((error) => {
+                console.error("Error al cargar las categorías:", error);
+                setLoading(false);
+            });
+
         // Si hay un ingrediente, cargar sus datos en el formulario
         if (ingrediente) {
             setNombre(ingrediente.nombre);
@@ -140,6 +154,7 @@ const ModalNuevoIngrediente = ({ open, onClose, onSave, ingrediente }) => {
                             </InputAdornment>
                         ),
                     }}
+                    sx={{ mb: 2 }}
                 />
 
                 <MarcaSelect setMarca={setMarca} />
@@ -157,22 +172,47 @@ const ModalNuevoIngrediente = ({ open, onClose, onSave, ingrediente }) => {
                             </InputAdornment>
                         ),
                     }}
+                    sx={{ mt: 2 }} // Esto agrega un margen superior
                 />
 
-                <TextField
-                    margin="dense"
-                    label="Unidad de Medida"
-                    fullWidth
-                    value={unidad_medida}
-                    onChange={(e) => setUnidadMedida(e.target.value)}
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <FontAwesomeIcon icon={faComment} />
-                            </InputAdornment>
-                        ),
-                    }}
-                />
+                {/* Mostrar las categorías como "Selecciona la unidad de medida" */}
+                <div>
+                    <h3>Selecciona la unidad de medida</h3>
+                    {loading ? (
+                        <p>Cargando...</p>
+                    ) : (
+                        categorias.map((categoria) => (
+                            <div key={categoria.id}>
+                                <h4>{categoria.nombre}</h4>
+                                <div>
+                                    {categoria.unidades.map((unidad) => (
+                                        <div
+                                            key={unidad.id}
+                                            onClick={() => setUnidadMedida(unidad.nombre)}
+                                            style={{
+                                                padding: "5px",
+                                                margin: "2px",
+                                                border: "1px solid #ccc",
+                                                display: "inline-block",
+                                                cursor: "pointer",
+                                                backgroundColor:
+                                                    unidad_medida === unidad.nombre
+                                                        ? "#cce5ff"
+                                                        : "transparent",
+                                                color:
+                                                    unidad_medida === unidad.nombre
+                                                        ? "#004085"
+                                                        : "inherit",
+                                            }}
+                                        >
+                                            {unidad.nombre}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
 
                 <TextField
                     margin="dense"
@@ -187,6 +227,7 @@ const ModalNuevoIngrediente = ({ open, onClose, onSave, ingrediente }) => {
                             </InputAdornment>
                         ),
                     }}
+                    sx={{ mt: 4 }} // Esto agrega un margen superior
                 />
             </DialogContent>
             <DialogActions>
