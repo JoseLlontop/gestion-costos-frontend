@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Button, TextField, Typography, Modal, IconButton, Alert, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useApiRequest } from '../../hook/useApiRequest';
+import ModalUsarIngredienteDeReceta from './ModalUsarIngredientesDeReceta';
 
 const ModalAgregarIngredienteXReceta = ({ open, handleClose, recetaId }) => {
     const [ingredientes, setIngredientes] = useState([]);
@@ -104,17 +105,7 @@ const ModalAgregarIngredienteXReceta = ({ open, handleClose, recetaId }) => {
                     {mensaje && (
                         <Alert severity="info" sx={{ mb: 2 }}>{mensaje}</Alert>
                     )}
-                    <Button
-                        variant="outlined"
-                        color="secondary"
-                        fullWidth
-                        onClick={() => {
-                            console.log("Open ModalUsarIngredienteDeReceta");
-                        }}
-                        sx={{ mb: 2 }}
-                    >
-                        Usar Ingredientes de Receta Existente
-                    </Button>
+                    <ModalUsarIngredienteDeReceta recetaId={recetaId} />
                     <Button
                         type="submit"
                         variant="contained"
