@@ -1,28 +1,28 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Paper, IconButton } from '@mui/material';
+import { Box, Button, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Paper, IconButton, Divider } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import ModalNuevoCosto from '../../components/costos/ModalNuevoCosto';
 import { useApiRequest } from '../../hook/useApiRequest';
 import { show_alerta } from '../../helpers/funcionSweetAlert';
+import GestionProduccion from '../../components/produccion/ProduccionComponent';
 
 interface Costo {
   id: number;
   nombre: string;
   tipo: string;
   valor: number;
+  totalCosto: number;
 }
 
 const GestionCostosAdicionales = () => {
   const [costos, setCostos] = useState<Costo[]>([]);
   const [nombreCostoBuscado, setNombreCostoBuscado] = useState("");
   const [openModal, setOpenModal] = useState(false);
-  const [currentCosto, setCurrentCosto] = useState<Costo | null>(null); // Estado para el costo en edición
+  const [currentCosto, setCurrentCosto] = useState<Costo | null>(null);
 
   const API_URL = "http://localhost:8080";
-
-  // Usa el tipo genérico <Costo[]> para que TypeScript sepa que `data` es un array de costos
   const { data, isLoading, error } = useApiRequest<Costo[]>(`${API_URL}/api/costos/`, 'GET');
 
   useEffect(() => {
@@ -35,40 +35,30 @@ const GestionCostosAdicionales = () => {
     costo.nombre?.toLowerCase().includes(nombreCostoBuscado.toLowerCase())
   );
 
-  // Guardar o modificar un costo
   const handleSaveCosto = async (costo: Costo) => {
     try {
       const url = costo.id
-        ? `${API_URL}/api/costos/${costo.id}` // Si tiene ID, es una actualización
-        : `${API_URL}/api/costos/crear`; // Si no tiene ID, es una creación
-
+        ? `${API_URL}/api/costos/${costo.id}`
+        : `${API_URL}/api/costos/crear`;
       const method = costo.id ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
         method: method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(costo),
       });
 
-      if (!response.ok) {
-        throw new Error('Error al guardar el costo');
-      }
-
+      if (!response.ok) throw new Error('Error al guardar el costo');
       const costoGuardado = await response.json();
 
-      // Actualizar el estado de los costos
       setCostos((prevCostos) =>
         costo.id
-          ? prevCostos.map((item) =>
-              item.id === costo.id ? costoGuardado : item
-            )
+          ? prevCostos.map((item) => (item.id === costo.id ? costoGuardado : item))
           : [...prevCostos, costoGuardado]
       );
 
-      setOpenModal(false); // Cerrar el modal después de guardar
-      setCurrentCosto(null); // Limpiar el costo actual
+      setOpenModal(false);
+      setCurrentCosto(null);
       show_alerta(costo.id ? "Costo modificado con éxito" : "Costo guardado con éxito", "success");
     } catch (error) {
       console.error('Error al guardar el costo', error);
@@ -76,13 +66,9 @@ const GestionCostosAdicionales = () => {
     }
   };
 
-  // Eliminar un costo
   const handleDeleteCosto = async (id: number) => {
     try {
-      const response = await fetch(`${API_URL}/api/costos/${id}`, {
-        method: 'DELETE',
-      });
-
+      const response = await fetch(`${API_URL}/api/costos/${id}`, { method: 'DELETE' });
       if (response.ok) {
         setCostos(prevCostos => prevCostos.filter(costo => costo.id !== id));
         show_alerta("Costo eliminado con éxito", "success");
@@ -95,45 +81,62 @@ const GestionCostosAdicionales = () => {
     }
   };
 
-  // Abrir el modal para editar un costo existente
   const handleEditCosto = (costo: Costo) => {
-    setCurrentCosto(costo); // Establece el costo actual para editar
-    setOpenModal(true); // Abre el modal
+    setCurrentCosto(costo);
+    setOpenModal(true);
   };
 
-  // Cerrar el modal y limpiar el costo actual
   const handleCloseModal = () => {
-    setCurrentCosto(null); // Limpiar el costo actual
-    setOpenModal(false); // Cerrar el modal
+    setCurrentCosto(null);
+    setOpenModal(false);
   };
 
   return (
-    <Box sx={{ padding: 1 }}>
-    <h1>Gestión de Costos Adicionales</h1>
-    <Typography variant="body1" align="left" sx={{ mb: 2 }}>
-    En esta pestaña se agregan los costos adicionales del negocio, que pueden ser de tipo fijos o variables.
-    </Typography>
+    <Box sx={{ padding: 3 }}>
+      <Typography
+        variant="h4"
+        align="center"
+        sx={{
+          fontWeight: 'bold',
+          backgroundColor: '#233044',
+          color: 'white',
+          padding: '1rem',
+          borderRadius: '8px',
+          boxShadow: 3,
+          marginBottom: '2rem',
+        }}
+      >
+        Gestión de Costos Adicionales
+      </Typography>
+
+      <Typography variant="body1" align="left" sx={{ mb: 2 }}>
+        En esta pestaña se agregan los costos adicionales del negocio, que pueden ser de tipo fijos o variables.
+      </Typography>
+      <GestionProduccion />
+
+      <br />
+      <Divider />
+      <br />
       <Box display="flex" justifyContent="center" sx={{ mb: 2 }}>
         <Button
           variant="contained"
           color="primary"
           startIcon={<AddIcon />}
           onClick={() => {
-            setCurrentCosto(null); // Limpiar el costo actual al agregar uno nuevo
-            setOpenModal(true); // Abre el modal
+            setCurrentCosto(null);
+            setOpenModal(true);
           }}
         >
           Añadir Costo
         </Button>
-
-        {/* Modal para añadir o editar costo */}
-        <ModalNuevoCosto
-          open={openModal}
-          onClose={handleCloseModal}
-          onSave={handleSaveCosto}
-          costo={currentCosto} // Pasar el costo actual al modal
-        />
       </Box>
+
+      <ModalNuevoCosto
+        open={openModal}
+        onClose={handleCloseModal}
+        onSave={handleSaveCosto}
+        costo={currentCosto}
+      />
 
       <TextField
         fullWidth
@@ -146,12 +149,13 @@ const GestionCostosAdicionales = () => {
 
       <TableContainer component={Paper} sx={{ boxShadow: 3 }}>
         <Table stickyHeader>
-          <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
-            <TableRow>
+          <TableHead>
+            <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
               <TableCell><strong>#</strong></TableCell>
               <TableCell><strong>Costo</strong></TableCell>
               <TableCell><strong>Tipo</strong></TableCell>
               <TableCell><strong>Valor</strong></TableCell>
+              <TableCell><strong>Costo en cada receta</strong></TableCell>
               <TableCell><strong>Acciones</strong></TableCell>
             </TableRow>
           </TableHead>
@@ -159,10 +163,11 @@ const GestionCostosAdicionales = () => {
             {costosFiltrados.length > 0 ? (
               costosFiltrados.map((costo, i) => (
                 <TableRow key={costo.id}>
-                  <TableCell>{(i + 1)}</TableCell>
+                  <TableCell>{i + 1}</TableCell>
                   <TableCell>{costo.nombre}</TableCell>
                   <TableCell>{costo.tipo}</TableCell>
                   <TableCell>${new Intl.NumberFormat("es-MX").format(costo.valor)}</TableCell>
+                  <TableCell>${new Intl.NumberFormat("es-MX").format(costo.totalCosto)}</TableCell>
                   <TableCell>
                     <IconButton color="primary" onClick={() => handleEditCosto(costo)}>
                       <EditIcon />
@@ -175,7 +180,7 @@ const GestionCostosAdicionales = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} align="center">
+                <TableCell colSpan={5} align="center">
                   <Typography variant="body2">No se encontraron costos con ese nombre.</Typography>
                 </TableCell>
               </TableRow>
@@ -183,14 +188,6 @@ const GestionCostosAdicionales = () => {
           </TableBody>
         </Table>
       </TableContainer>
-
-      {costos.length === 0 && !isLoading && !error && (
-        <Box display="flex" justifyContent="center" sx={{ mt: 3 }}>
-          <Typography variant="body2" color="textSecondary">
-            No hay costos cargados todavía. ¡Empieza añadiendo un nuevo costo!
-          </Typography>
-        </Box>
-      )}
     </Box>
   );
 };

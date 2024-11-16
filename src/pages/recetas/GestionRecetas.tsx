@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+
+import GestionProduccion from '../../components/produccion/ProduccionComponent';
 import {
     Box,
     Button,
@@ -14,6 +16,7 @@ import {
     Paper,
     IconButton,
     Modal,
+    Divider,
 } from "@mui/material";
 import ModalNuevaReceta from "../../components/recetas/ModalNuevaReceta";
 import ModalModificarCantidad from "../../components/recetas/ModalModificarCantidad";
@@ -241,11 +244,36 @@ const GestionRecetas = () => {
     };
 
     return (
+        
         <Box sx={{ padding: 1 }}>
-            <h1>Gestión de Recetas</h1>
-            <Typography variant="body1" align="left" sx={{ mb: 2 }}>
-            En esta pestaña vas a poder agregar las recetas de tu negocio, las mismas se componen de ingredientes.
+            <Typography
+                variant="h4"
+                align="center"
+                sx={{
+                fontWeight: 'bold',
+                backgroundColor: '#233044',
+                color: 'white',
+                padding: '1rem',
+                borderRadius: '8px',
+                boxShadow: 3,
+                marginBottom: '2rem',
+                }}
+                >
+                    Gestión de Recetas
             </Typography>
+
+
+            <Typography variant="body1" align="left" sx={{ mb: 2 }}>
+                  En esta pestaña vas a poder agregar las recetas de tu negocio, las mismas se componen de ingredientes.
+            </Typography>
+
+
+            
+            <GestionProduccion />
+            
+            <br />
+            <Divider />
+            <br />
             <Box display="flex" justifyContent="center" sx={{ mb: 2 }}>
                 <Button
                     variant="contained"
