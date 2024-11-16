@@ -105,6 +105,17 @@ const ModalAgregarIngredienteXReceta = ({ open, handleClose, recetaId }) => {
                         <Alert severity="info" sx={{ mb: 2 }}>{mensaje}</Alert>
                     )}
                     <Button
+                        variant="outlined"
+                        color="secondary"
+                        fullWidth
+                        onClick={() => {
+                            console.log("Open ModalUsarIngredienteDeReceta");
+                        }}
+                        sx={{ mb: 2 }}
+                    >
+                        Usar Ingredientes de Receta Existente
+                    </Button>
+                    <Button
                         type="submit"
                         variant="contained"
                         color="primary"
