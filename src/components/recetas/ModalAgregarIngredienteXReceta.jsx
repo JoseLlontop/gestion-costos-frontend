@@ -95,7 +95,7 @@ const ModalAgregarIngredienteXReceta = ({ open, handleClose, recetaId }) => {
                     </TextField>
                     <TextField
                         fullWidth
-                        label="Cantidad (Gramos)"
+                        label="Cantidad (Gramos o Litros)"
                         variant="outlined"
                         value={cantidad}
                         onChange={(e) => setCantidad(e.target.value)}

@@ -95,6 +95,10 @@ const GestionGanancia: React.FC = () => {
                 <Typography variant="h4" gutterBottom>
                     Gestión de Ganancia por Receta
                 </Typography>
+                <Typography variant="body1" align="left" sx={{ mb: 1 }}>
+                En esta pestaña se administra la ganancia que se obtiene por cada receta individualmente.
+                Buscá y seleccioná una receta que hayas creado. Esta va a contener todos los detalles de composición y costos. 
+                </Typography>
             </Grid>
 
             <Grid item xs={12}>
@@ -271,6 +275,10 @@ const GestionGanancia: React.FC = () => {
                     <Grid item xs={12}>
                         <Card>
                             <CardContent>
+                                <Typography variant="body1" align="left" sx={{ mb: 3 }}>
+                                En esta sección se puede calcular el precio de venta de un producto a partir de un margen de ganancia ingresado.
+                                A su vez, se puede calcular el porcentaje de ganancia a partir de un precio de venta ingresado por teclado.
+                                </Typography>
                                 <Box
                                     display="flex"
                                     alignItems="center"

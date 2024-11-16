@@ -23,8 +23,22 @@ const ModalNuevoIngrediente = ({ open, onClose, onSave, ingrediente }) => {
     const [cantidad_paquete, setCantidadPaquete] = useState("");
     const [error, setError] = useState("");
     const [openModalMarca, setOpenModalMarca] = useState(false);
+    const [categorias, setCategorias] = useState([]); // Para almacenar las categorías
+    const [loading, setLoading] = useState(true); // Para manejar la carga
 
     useEffect(() => {
+        // Cargar las categorías desde la API
+        fetch("http://localhost:8080/api/unidades/categorias")
+            .then((response) => response.json())
+            .then((data) => {
+                setCategorias(data);
+                setLoading(false);
+            })
+            .catch((error) => {
+                console.error("Error al cargar las categorías:", error);
+                setLoading(false);
+            });
+
         // Si hay un ingrediente, cargar sus datos en el formulario
         if (ingrediente) {
             setNombre(ingrediente.nombre);
@@ -77,14 +91,17 @@ const ModalNuevoIngrediente = ({ open, onClose, onSave, ingrediente }) => {
 
         setError("");
 
-        // Llamar a onSave con los datos del ingrediente
+        // Aplicar la conversión de unidad
+        const { cantidadConvertida, unidadConvertida } = convertirUnidad(unidad_medida, parsedCantidadPaquete);
+
+        // Llamar a onSave con los datos convertidos
         onSave({
-            id: ingrediente?.id || null, // Incluye el ID solo si es edición
+            id: ingrediente?.id || null,
             nombre,
             marca,
             precio: parsedPrecio,
-            unidad_medida,
-            cantidad_paquete: parsedCantidadPaquete,
+            unidad_medida: unidadConvertida,
+            cantidad_paquete: cantidadConvertida,
         });
 
         // Mostrar alerta de éxito después de guardar o actualizar
@@ -119,6 +136,51 @@ const ModalNuevoIngrediente = ({ open, onClose, onSave, ingrediente }) => {
         setOpenModalMarca(false); // Cierra el modal después de guardar
     };
 
+    // Función para convertir unidades a gramos o litros considerando todos los prefijos
+    const convertirUnidad = (unidad, cantidad) => {
+        // Convertir la unidad a minúsculas
+        unidad = unidad.toLowerCase();
+
+        // Factores de conversión para masa y capacidad
+        const factoresMasa = {
+            mg: 0.001,   // miligramos a gramos
+            cg: 0.01,    // centigramos a gramos
+            dg: 0.1,     // decigramos a gramos
+            g: 1,        // gramos
+            dag: 10,     // decagramos a gramos
+            hg: 100,     // hectogramos a gramos
+            kg: 1000     // kilogramos a gramos
+        };
+
+        const factoresCapacidad = {
+            ml: 0.001,   // mililitros a litros
+            cl: 0.01,    // centilitros a litros
+            dl: 0.1,     // decilitros a litros
+            l: 1,        // litros
+            dal: 10,     // decalilitros a litros
+            hl: 100,     // hectolitros a litros
+            kl: 1000     // kilolitros a litros
+        };
+
+        let cantidadConvertida = cantidad;
+        let unidadConvertida = unidad;
+
+        // Verificar y aplicar conversión para unidades de masa
+        if (factoresMasa[unidad] !== undefined) {
+            cantidadConvertida = cantidad * factoresMasa[unidad];
+            unidadConvertida = "g";
+        }
+        // Verificar y aplicar conversión para unidades de capacidad
+        else if (factoresCapacidad[unidad] !== undefined) {
+            cantidadConvertida = cantidad * factoresCapacidad[unidad];
+            unidadConvertida = "l";
+        } else {
+            console.warn(`Unidad de medida desconocida: ${unidad}`);
+        }
+
+        return { cantidadConvertida, unidadConvertida };
+    };
+
     return (
         <Dialog open={open} onClose={onClose}>
             <DialogTitle>
@@ -140,6 +202,7 @@ const ModalNuevoIngrediente = ({ open, onClose, onSave, ingrediente }) => {
                             </InputAdornment>
                         ),
                     }}
+                    sx={{ mb: 2 }}
                 />
 
                 <MarcaSelect setMarca={setMarca} />
@@ -157,22 +220,47 @@ const ModalNuevoIngrediente = ({ open, onClose, onSave, ingrediente }) => {
                             </InputAdornment>
                         ),
                     }}
+                    sx={{ mt: 2 }} // Esto agrega un margen superior
                 />
 
-                <TextField
-                    margin="dense"
-                    label="Unidad de Medida"
-                    fullWidth
-                    value={unidad_medida}
-                    onChange={(e) => setUnidadMedida(e.target.value)}
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <FontAwesomeIcon icon={faComment} />
-                            </InputAdornment>
-                        ),
-                    }}
-                />
+                {/* Mostrar las categorías como "Selecciona la unidad de medida" */}
+                <div>
+                    <h3>Selecciona la unidad de medida</h3>
+                    {loading ? (
+                        <p>Cargando...</p>
+                    ) : (
+                        categorias.map((categoria) => (
+                            <div key={categoria.id}>
+                                <h4>{categoria.nombre}</h4>
+                                <div>
+                                    {categoria.unidades.map((unidad) => (
+                                        <div
+                                            key={unidad.id}
+                                            onClick={() => setUnidadMedida(unidad.nombre)}
+                                            style={{
+                                                padding: "5px",
+                                                margin: "2px",
+                                                border: "1px solid #ccc",
+                                                display: "inline-block",
+                                                cursor: "pointer",
+                                                backgroundColor:
+                                                    unidad_medida === unidad.nombre
+                                                        ? "#cce5ff"
+                                                        : "transparent",
+                                                color:
+                                                    unidad_medida === unidad.nombre
+                                                        ? "#004085"
+                                                        : "inherit",
+                                            }}
+                                        >
+                                            {unidad.nombre}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
 
                 <TextField
                     margin="dense"
@@ -187,6 +275,7 @@ const ModalNuevoIngrediente = ({ open, onClose, onSave, ingrediente }) => {
                             </InputAdornment>
                         ),
                     }}
+                    sx={{ mt: 4 }} // Esto agrega un margen superior
                 />
             </DialogContent>
             <DialogActions>

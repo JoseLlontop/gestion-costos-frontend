@@ -81,7 +81,7 @@ const ModalMoficarCantidad = ({ open, handleClose, recetaId, ingredienteId }) =>
                 <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
                     <TextField
                         fullWidth
-                        label="Cantidad (Gramos)"
+                        label="Cantidad (Gramos o Litros)"
                         variant="outlined"
                         value={cantidad}
                         onChange={(e) => setCantidad(e.target.value)}
