@@ -22,7 +22,7 @@ const style = {
   
   
 
-function ModalUsarIngredienteDeReceta() {
+function ModalUsarIngredienteDeReceta({ recetaId }) {
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => {
       setOpen(true);
@@ -44,6 +44,33 @@ function ModalUsarIngredienteDeReceta() {
             setRecetas(data || []);
         }
     }, [data, isLoading, error]);
+
+
+    const agregar = async (recetaUsarId) => {
+
+        try {
+            const response = await fetch(
+                `${API_URL}/api/IngredientesXReceta/agregarIngredientesDeReceta?recetaId=${recetaId}&recetaIngredientesId=${recetaUsarId}`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    
+                }
+            );
+
+            if (response.ok) {
+                const data = await response.json();
+                window.location.reload(); //ESTO HAY QUE HACERLO MEJOR
+                console.log(data);
+            } else {
+                console.log("Error al agregar los ingredientes");
+            }
+        } catch (error) {
+            console.error("Error en la solicitud al backend", error);
+        }
+    };
   
     return (
       <React.Fragment>
@@ -67,9 +94,14 @@ function ModalUsarIngredienteDeReceta() {
           <Box sx={{ ...style, width: 500 }}>
         
             {recetas.map((receta) => (
-                               <Button  color="primary"
-                               fullWidth>{receta.nombreReceta}</Button>
+        <Button  color="primary"
+        fullWidth
+        onClick={() => agregar(receta.id)}
+        >{receta.nombreReceta}
+       
+        </Button>
                             ))}
+
           </Box>
         </Modal>
       </React.Fragment>

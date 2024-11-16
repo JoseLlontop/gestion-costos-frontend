@@ -105,7 +105,7 @@ const ModalAgregarIngredienteXReceta = ({ open, handleClose, recetaId }) => {
                     {mensaje && (
                         <Alert severity="info" sx={{ mb: 2 }}>{mensaje}</Alert>
                     )}
-                    <ModalUsarIngredienteDeReceta />
+                    <ModalUsarIngredienteDeReceta recetaId={recetaId} />
                     <Button
                         type="submit"
                         variant="contained"
