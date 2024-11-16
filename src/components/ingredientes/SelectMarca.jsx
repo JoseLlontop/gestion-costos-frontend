@@ -4,6 +4,7 @@ import {
     InputLabel,
     Select,
     MenuItem,
+    FormHelperText,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 
@@ -39,6 +40,9 @@ const MarcaSelect = ({ setMarca }) => {
                     </MenuItem>
                 ))}
             </Select>
+            <FormHelperText sx={{ marginLeft:"0", fontSize: "0.75rem", fontStyle: "italic" }}>
+                Las marcas se deben crear en el gestor de marcas.
+            </FormHelperText>
         </FormControl>
     );
 };
